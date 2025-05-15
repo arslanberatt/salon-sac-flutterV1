@@ -4,6 +4,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 
 class AdvanceApprovalController extends GetxController {
   final advanceList = <Map<String, dynamic>>[].obs;
+  final advanceWaitList = <Map<String, dynamic>>[].obs;
   final loading = false.obs;
 
   final String fetchQuery = """
@@ -55,8 +56,13 @@ class AdvanceApprovalController extends GetxController {
         return;
       }
 
-      advanceList.value =
+      final allData =
           List<Map<String, dynamic>>.from(result.data!['advanceRequests']);
+      advanceList.value = allData;
+
+      // 🔎 Beklemede olanları ayıkla
+      advanceWaitList.value =
+          allData.where((e) => e['status'] == 'beklemede').toList();
     } catch (e) {
       print("❌ Hata: $e");
     } finally {

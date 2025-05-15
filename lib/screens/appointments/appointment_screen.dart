@@ -1,4 +1,6 @@
 import 'package:mobil/controllers/appointments/appointment_controller.dart';
+import 'package:mobil/screens/common/appointment_loading_screen.dart';
+import 'package:mobil/screens/common/splash_screen.dart';
 import 'package:mobil/screens/shared/check_in_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
@@ -19,20 +21,8 @@ class AppointmentScreen extends StatelessWidget {
           centerTitle: true,
           backgroundColor: Colors.grey[100],
           elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: Image.asset(
-                "assets/images/logo.jpg",
-                height: 40,
-                width: 40,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           title: const Text(
-            "SALON SAÇ",
+            "RANDEVULAR",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontFamily: 'Domine',
@@ -42,7 +32,7 @@ class AppointmentScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.loading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return AppointmentLoadingScreen();
         }
 
         return Padding(

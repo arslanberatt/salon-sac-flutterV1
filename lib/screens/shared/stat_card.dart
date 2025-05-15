@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobil/utils/constants/sizes.dart';
+import 'package:mobil/utils/loaders/shimmer.dart';
 
 class StatCard extends StatelessWidget {
   final String title;
@@ -9,6 +10,7 @@ class StatCard extends StatelessWidget {
   final BoxDecoration decoration;
   final Color cardTextColor;
   final Function()? onTap;
+  final bool isLoading;
 
   const StatCard({
     super.key,
@@ -19,6 +21,7 @@ class StatCard extends StatelessWidget {
     this.width = 200,
     required this.cardTextColor,
     this.onTap,
+    this.isLoading = false,
   });
 
   @override
@@ -40,11 +43,13 @@ class StatCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(icon, size: 30, color: cardTextColor),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: cardTextColor, fontWeight: FontWeight.w600),
-              ),
+              isLoading
+                  ? const ShimmerEffect(height: 10, width: double.infinity)
+                  : Text(
+                      value,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: cardTextColor, fontWeight: FontWeight.w600),
+                    ),
               Text(
                 title,
                 style: TextStyle(fontSize: 14, color: cardTextColor),

@@ -36,7 +36,7 @@ class SplashScreen extends StatelessWidget {
       final session = Get.find<UserSessionController>();
       session.setUser(
         userId: id,
-        userName: "", // JWT'de name yoksa boş bırakıyoruz
+        userName: "",
         userRole: role,
       );
 
@@ -58,7 +58,7 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    checkAuth(); // Uygulama açıldığında tetiklenir
+    checkAuth();
 
     return Scaffold(
       body: Center(
