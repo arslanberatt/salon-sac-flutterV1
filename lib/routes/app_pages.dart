@@ -4,6 +4,7 @@ import 'package:mobil/screens/boss/advance_approval_screen.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
 import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/profile_screen.dart';
+import 'package:mobil/screens/employee/performance_screen.dart';
 import 'package:mobil/screens/employee/salary_record_screen.dart';
 import 'package:mobil/screens/boss/service_list_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
@@ -29,6 +30,7 @@ class AppRoutes {
   static const String salaryRecord = '/salary_record';
   static const String profile = '/profile';
   static const String settings = '/settings';
+  static const String performance = '/performance';
 
   static final List<GetPage> routes = [
     GetPage(name: splash, page: () => SplashScreen()),
@@ -41,9 +43,10 @@ class AppRoutes {
     GetPage(name: employees, page: () => const EmployeesScreen()),
     GetPage(name: advanceRequests, page: () => const RequestAdvanceScreen()),
     GetPage(name: advanceApproval, page: () => const AdvanceApprovalScreen()),
-    GetPage(name: transaction, page: () => const TransactionScreen()),
+    GetPage(name: transaction, page: () => TransactionScreen()),
     GetPage(name: salaryRecord, page: () => const SalaryRecordScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: settings, page: () => const SettingsScreen()),
+    GetPage(name: performance, page: () => const PerformanceScreen()),
   ];
 }

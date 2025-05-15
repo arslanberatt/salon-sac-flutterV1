@@ -22,7 +22,7 @@ class AppointmentScreen extends StatelessWidget {
           backgroundColor: Colors.grey[100],
           elevation: 0,
           title: const Text(
-            "RANDEVULAR",
+            "Randevular",
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontFamily: 'Domine',

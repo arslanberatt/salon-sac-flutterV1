@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 
 class AddCustomerController extends GetxController {
@@ -39,25 +40,22 @@ class AddCustomerController extends GetxController {
       final client = GraphQLService.client.value;
 
       final result = await client.mutate(MutationOptions(
-        document: gql(addCustomerMutation),
-        variables: {
-          "name": name,
-          "phone": phone,
-          "notes": notes.isEmpty ? null : notes,
-        },
-        fetchPolicy: FetchPolicy.noCache,
-      ));
+          document: gql(addCustomerMutation),
+          variables: {
+            "name": name,
+            "phone": phone,
+            "notes": notes.isEmpty ? null : notes,
+          },
+          fetchPolicy: FetchPolicy.noCache,
+          onCompleted: (data) => Get.back(result: true)));
 
       if (result.hasException) {
         throw result.exception!;
       }
-
-      Get.snackbar("Başarılı", "Müşteri başarıyla eklendi.",
-          snackPosition: SnackPosition.BOTTOM);
-      Get.offAllNamed("/main");
+      CustomSnackBar.successSnackBar(
+          title: "İşlem Başarılı!",
+          message: "Müşteri sisteme başarı ile eklendi.");
     } catch (e) {
-      Get.snackbar("Hata", "Ekleme sırasında bir sorun oluştu.",
-          snackPosition: SnackPosition.BOTTOM);
       print("❌ Müşteri ekleme hatası: $e");
     } finally {
       isSaving.value = false;

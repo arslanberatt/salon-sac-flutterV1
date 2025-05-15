@@ -1,7 +1,9 @@
-// add_appointment_screen.dart
-import 'package:mobil/controllers/appointments/appointment_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
+import 'package:mobil/controllers/appointments/appointment_controller.dart';
+import 'package:mobil/screens/common/appointment_loading_screen.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 import '../../controllers/appointments/add_appointment_controller.dart';
 
 class AddAppointmentScreen extends StatelessWidget {
@@ -12,10 +14,11 @@ class AddAppointmentScreen extends StatelessWidget {
     final controller = Get.put(AddAppointmentController());
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(title: const Text("Randevu Ekle")),
       body: Obx(() {
         if (controller.loading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: AppointmentLoadingScreen());
         }
 
         return Padding(
@@ -24,26 +27,44 @@ class AddAppointmentScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                DropdownButtonFormField(
-                  value: controller.selectedCustomerId.value.isEmpty
-                      ? null
-                      : controller.selectedCustomerId.value,
-                  hint: const Text("Müşteri Seçin"),
-                  items: controller.customers
-                      .map((c) => DropdownMenuItem(
-                            value: c['id'],
-                            child: Text(c['name']),
-                          ))
-                      .toList(),
-                  onChanged: (val) =>
-                      controller.selectedCustomerId.value = val as String,
+                /// 🔍 Müşteri Arama
+                TypeAheadField<Map<String, dynamic>>(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    controller: controller.customerNameController,
+                    focusNode: controller.customerFocusNode,
+                    decoration: const InputDecoration(
+                      labelText: "Müşteri Ara",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  suggestionsCallback: (pattern) {
+                    return controller.customers
+                        .where((c) => c['name']
+                            .toString()
+                            .toLowerCase()
+                            .contains(pattern.toLowerCase()))
+                        .toList();
+                  },
+                  itemBuilder: (context, suggestion) {
+                    return ListTile(title: Text(suggestion['name']));
+                  },
+                  onSuggestionSelected: (suggestion) {
+                    controller.selectedCustomerId.value = suggestion['id'];
+                    controller.customerNameController.text = suggestion['name'];
+                  },
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 16),
+
+                /// 👤 Çalışan Seçimi
                 DropdownButtonFormField(
+                  decoration: const InputDecoration(
+                    labelText: "Çalışan Seçin",
+                    border: OutlineInputBorder(),
+                  ),
                   value: controller.selectedEmployeeId.value.isEmpty
                       ? null
                       : controller.selectedEmployeeId.value,
-                  hint: const Text("Çalışan Seçin"),
                   items: controller.employees
                       .map((e) => DropdownMenuItem(
                             value: e['id'],
@@ -53,37 +74,63 @@ class AddAppointmentScreen extends StatelessWidget {
                   onChanged: (val) =>
                       controller.selectedEmployeeId.value = val as String,
                 ),
-                const SizedBox(height: 10),
-                const Text("Hizmet Seçin:"),
-                Wrap(
-                  spacing: 8,
-                  children: controller.services.map((service) {
-                    final isSelected =
-                        controller.selectedServiceIds.contains(service['id']);
-                    return FilterChip(
-                      label: Text(service['title']),
-                      selected: isSelected,
-                      onSelected: (_) {
-                        if (isSelected) {
-                          controller.selectedServiceIds.remove(service['id']);
-                        } else {
-                          controller.selectedServiceIds.add(service['id']);
-                        }
-                      },
-                    );
-                  }).toList(),
+
+                const SizedBox(height: 16),
+
+                /// 💇 Hizmet Seçimi
+                const Text("Hizmetler",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 40,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: controller.services.map((service) {
+                      final isSelected =
+                          controller.selectedServiceIds.contains(service['id']);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: FilterChip(
+                          label: Text(service['title']),
+                          selected: isSelected,
+                          onSelected: (_) {
+                            if (isSelected) {
+                              controller.selectedServiceIds
+                                  .remove(service['id']);
+                            } else {
+                              controller.selectedServiceIds.add(service['id']);
+                            }
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 16),
+
+                /// 📝 Notlar
                 TextFormField(
-                  decoration:
-                      const InputDecoration(labelText: "Notlar (opsiyonel)"),
+                  decoration: const InputDecoration(
+                    labelText: "Not (Opsiyonel)",
+                    border: OutlineInputBorder(),
+                  ),
                   onChanged: (val) => controller.notes.value = val,
+                  maxLines: 2,
                 ),
-                const SizedBox(height: 10),
+
+                const SizedBox(height: 16),
+
                 ListTile(
-                  title: Text(controller.selectedDateTime.value == null
-                      ? "Başlangıç Zamanı Seçin"
-                      : controller.selectedDateTime.value.toString()),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Colors.grey),
+                  ),
+                  title: Text(
+                    controller.selectedDateTime.value == null
+                        ? "Başlangıç Zamanı Seçin"
+                        : controller.selectedDateTime.value.toString(),
+                  ),
                   trailing: const Icon(Icons.calendar_month),
                   onTap: () async {
                     final picked = await showDatePicker(
@@ -98,36 +145,68 @@ class AddAppointmentScreen extends StatelessWidget {
                         initialTime: TimeOfDay.now(),
                       );
                       if (time != null) {
-                        final dateTime = DateTime(picked.year, picked.month,
-                            picked.day, time.hour, time.minute);
+                        final dateTime = DateTime(
+                          picked.year,
+                          picked.month,
+                          picked.day,
+                          time.hour,
+                          time.minute,
+                        );
                         controller.selectedDateTime.value = dateTime;
                       }
                     }
                   },
                 ),
-                const SizedBox(height: 20),
+
+                const SizedBox(height: 16),
+
+                /// 🧮 Süre ve Ücret
                 Obx(() => Text(
-                    "Toplam Süre: ${controller.totalDuration} dk, Ücret: ₺${controller.totalPrice.toStringAsFixed(2)}")),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    final success = await controller.submitAppointment();
-                    if (success) {
-                      final appointmentController =
-                          Get.isRegistered<AppointmentController>()
-                              ? Get.find<AppointmentController>()
-                              : null;
+                      "Toplam Süre: ${controller.totalDuration} dk  •  Ücret: ₺${controller.totalPrice.toStringAsFixed(2)}",
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    )),
 
-                      appointmentController?.fetchAppointments();
-
-                      Get.snackbar("Başarılı", "Randevu oluşturuldu");
-                      Get.offAllNamed('/main');
-                    } else {
-                      Get.snackbar("Hata", "Randevu oluşturulamadı");
-                    }
-                  },
-                  child: const Text("Randevu Oluştur"),
-                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: Obx(() => ElevatedButton(
+                        style: ElevatedButton.styleFrom(),
+                        onPressed: controller.loading.value
+                            ? null
+                            : () async {
+                                final success =
+                                    await controller.submitAppointment();
+                                if (success) {
+                                  final appointmentController =
+                                      Get.isRegistered<AppointmentController>()
+                                          ? Get.find<AppointmentController>()
+                                          : null;
+                                  appointmentController?.fetchAppointments();
+                                  Get.snackbar(
+                                      "Başarılı", "Randevu oluşturuldu");
+                                  Get.offAllNamed('/forRefresh');
+                                } else {
+                                  Get.snackbar(
+                                      "Hata", "Randevu oluşturulamadı");
+                                }
+                              },
+                        child: controller.loading.value
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
+                            : Text(
+                                "Randevu Oluştur",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineSmall
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontSize:
+                                          ProjectSizes.containerPaddingM / 1.5,
+                                    ),
+                              ),
+                      )),
+                )
               ],
             ),
           ),

@@ -2,6 +2,7 @@ import 'package:mobil/utils/services/graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class RequestAdvanceController extends GetxController {
   final amountController = TextEditingController();
@@ -22,7 +23,8 @@ class RequestAdvanceController extends GetxController {
     final amount = double.tryParse(amountController.text.trim());
 
     if (amount == null || amount <= 0) {
-      Get.snackbar("Hata", "Geçerli bir tutar girin");
+      CustomSnackBar.errorSnackBar(
+          title: "Hatalı İşlem!", message: "Lütfen geçerli bir tutar giriniz.");
       return;
     }
 
@@ -40,7 +42,9 @@ class RequestAdvanceController extends GetxController {
       if (result.hasException) {
         Get.snackbar("Hata", result.exception.toString());
       } else {
-        Get.snackbar("Başarılı", "Talebiniz gönderildi");
+        CustomSnackBar.successSnackBar(
+            title: "Başarılı İşlem!",
+            message: "Avans istemi başarı ile gerçekleşti.");
         amountController.clear();
         reasonController.clear();
       }

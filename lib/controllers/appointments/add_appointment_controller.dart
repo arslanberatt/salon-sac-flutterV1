@@ -1,20 +1,30 @@
-// add_appointment_controller.dart
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 
 class AddAppointmentController extends GetxController {
+  /// --- UI Kontrolleri ---
+  final customerNameController = TextEditingController();
+  final customerFocusNode = FocusNode();
+
+  /// --- Data listeleri ---
   final customers = <Map<String, dynamic>>[].obs;
   final employees = <Map<String, dynamic>>[].obs;
   final services = <Map<String, dynamic>>[].obs;
 
+  /// --- Seçimler ---
   final selectedCustomerId = ''.obs;
   final selectedEmployeeId = ''.obs;
   final selectedServiceIds = <String>[].obs;
   final selectedDateTime = Rxn<DateTime>();
   final notes = ''.obs;
+
+  /// --- Durum ---
   final loading = false.obs;
 
+  /// --- Queries ---
   final String customersQuery = """
     query {
       customers {
@@ -66,28 +76,7 @@ class AddAppointmentController extends GetxController {
     }
   """;
 
-  void fetchAllData() async {
-    loading.value = true;
-    final client = GraphQLService.client.value;
-
-    try {
-      final c = await client.query(QueryOptions(
-          document: gql(customersQuery), fetchPolicy: FetchPolicy.noCache));
-      final e = await client.query(QueryOptions(
-          document: gql(employeesQuery), fetchPolicy: FetchPolicy.noCache));
-      final s = await client.query(QueryOptions(
-          document: gql(servicesQuery), fetchPolicy: FetchPolicy.noCache));
-
-      customers.value = List<Map<String, dynamic>>.from(c.data!['customers']);
-      employees.value = List<Map<String, dynamic>>.from(e.data!['employees']);
-      services.value = List<Map<String, dynamic>>.from(s.data!['services']);
-    } catch (e) {
-      print("❌ Veri çekme hatası: $e");
-    } finally {
-      loading.value = false;
-    }
-  }
-
+  /// --- Toplamlar ---
   double get totalPrice {
     return services
         .where((s) => selectedServiceIds.contains(s['id']))
@@ -100,13 +89,50 @@ class AddAppointmentController extends GetxController {
         .fold(0, (sum, item) => sum + (item['duration'] as int));
   }
 
-  Future<bool> submitAppointment() async {
-    final client = GraphQLService.client.value;
+  /// --- Veri çekme ---
+  void fetchAllData() async {
     loading.value = true;
+    final client = GraphQLService.client.value;
+
+    try {
+      final c = await client.query(QueryOptions(
+          document: gql(customersQuery), fetchPolicy: FetchPolicy.noCache));
+      final e = await client.query(QueryOptions(
+          document: gql(employeesQuery), fetchPolicy: FetchPolicy.noCache));
+      final s = await client.query(QueryOptions(
+          document: gql(servicesQuery), fetchPolicy: FetchPolicy.noCache));
+
+      customers.value =
+          List<Map<String, dynamic>>.from(c.data?['customers'] ?? []);
+      employees.value =
+          List<Map<String, dynamic>>.from(e.data?['employees'] ?? []);
+      services.value =
+          List<Map<String, dynamic>>.from(s.data?['services'] ?? []);
+    } catch (e) {
+      print("❌ Veri çekme hatası: $e");
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  /// --- Randevu gönderme ---
+  Future<bool> submitAppointment() async {
+    if (selectedCustomerId.isEmpty ||
+        selectedEmployeeId.isEmpty ||
+        selectedServiceIds.isEmpty ||
+        selectedDateTime.value == null) {
+      CustomSnackBar.errorSnackBar(
+          title: "Hatalı Kayıt!", message: "Lütfen tüm alanları doldurunuz.");
+      return false;
+    }
+
+    loading.value = true;
+    final client = GraphQLService.client.value;
 
     try {
       final result = await client.mutate(MutationOptions(
         document: gql(addAppointmentMutation),
+        fetchPolicy: FetchPolicy.noCache,
         variables: {
           'customerId': selectedCustomerId.value,
           'employeeId': selectedEmployeeId.value,
@@ -115,7 +141,6 @@ class AddAppointmentController extends GetxController {
           'totalPrice': totalPrice,
           'notes': notes.value.isEmpty ? null : notes.value,
         },
-        fetchPolicy: FetchPolicy.noCache,
       ));
 
       if (result.hasException) {
@@ -132,9 +157,27 @@ class AddAppointmentController extends GetxController {
     }
   }
 
+  /// --- Temizleme / Reset ---
+  void clearForm() {
+    selectedCustomerId.value = '';
+    selectedEmployeeId.value = '';
+    selectedServiceIds.clear();
+    selectedDateTime.value = null;
+    notes.value = '';
+    customerNameController.clear();
+  }
+
+  /// --- Lifecycle ---
   @override
   void onInit() {
     super.onInit();
     fetchAllData();
+  }
+
+  @override
+  void onClose() {
+    customerNameController.dispose();
+    customerFocusNode.dispose();
+    super.onClose();
   }
 }

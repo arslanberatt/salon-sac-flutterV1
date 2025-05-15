@@ -72,4 +72,10 @@ class TransactionController extends GetxController {
     super.onInit();
     fetchTransactions();
   }
+
+  final visibleCount = 5.obs;
+
+  void loadMore() {
+    visibleCount.value += 5;
+  }
 }

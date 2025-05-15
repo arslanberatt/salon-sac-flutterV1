@@ -60,7 +60,7 @@ class AddServiceController extends GetxController {
     serviceController?.fetchServices();
 
     Get.snackbar("Başarılı", "Hizmet eklendi");
-    Get.offAllNamed('/main');
+    Get.back();
   }
 
   @override

@@ -11,6 +11,7 @@ class AppointmentController extends GetxController {
   final customers = <Map<String, dynamic>>[].obs;
   final loading = false.obs;
   final selectedDate = DateTime.now().obs;
+  final waitingAppointments = 0.obs;
 
   final String appointmentsQuery = """
     query {
@@ -98,11 +99,18 @@ class AppointmentController extends GetxController {
       if (session.isPatron) {
         print("🟢 Patron giriş yaptı");
         appointments.value = allAppointments;
+        waitingAppointments.value = allAppointments
+            .where((appt) => appt["status"] == "bekliyor")
+            .length;
       } else if (session.isEmployee) {
         print("🟢 Çalışan giriş yaptı");
         appointments.value = allAppointments
             .where((a) => a["employeeId"] == session.id.value)
             .toList();
+        waitingAppointments.value = allAppointments
+            .where((appt) => appt["status"] == "bekliyor")
+            .where((a) => a["employeeId"] == session.id.value)
+            .length;
       } else {
         print("🟢 Bilinmeyen giriş yaptı");
         appointments.clear();
@@ -166,5 +174,21 @@ class AppointmentController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAppointments();
+  }
+
+  String calculateDuration(dynamic start, dynamic end) {
+    try {
+      final startTime = start is int
+          ? DateTime.fromMillisecondsSinceEpoch(start)
+          : DateTime.fromMillisecondsSinceEpoch(int.parse(start));
+      final endTime = end is int
+          ? DateTime.fromMillisecondsSinceEpoch(end)
+          : DateTime.fromMillisecondsSinceEpoch(int.parse(end));
+
+      final diff = endTime.difference(startTime);
+      return "${diff.inHours} saat ${diff.inMinutes % 60} dk";
+    } catch (_) {
+      return "-";
+    }
   }
 }

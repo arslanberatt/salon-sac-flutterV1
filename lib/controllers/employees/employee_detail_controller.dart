@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/screens/boss/employee_detail_screen.dart';
+import 'package:mobil/screens/boss/employees_screen.dart';
 import '../../utils/services/graphql_service.dart';
 
 class EmployeeDetailController extends GetxController {
@@ -26,7 +28,7 @@ class EmployeeDetailController extends GetxController {
     role.value = employee["role"];
   }
 
-  final String updateMutation = """
+  final String updateFinanceMutation = """
     mutation UpdateEmployeeByPatron(
       \$id: ID!,
       \$salary: Float,
@@ -47,15 +49,37 @@ class EmployeeDetailController extends GetxController {
     }
   """;
 
+  final String updateRoleMutation = """
+    mutation UpdateEmployeeRole(
+      \$id: ID!,
+      \$role: String!,
+      \$password: String!
+    ) {
+      updateEmployeeRole(id: \$id, role: \$role, password: \$password) {
+        id
+        role
+      }
+    }
+  """;
+
   Future<void> updateEmployee() async {
-    final client = GraphQLService.client.value;
+    if (passwordController.text.trim().isEmpty) {
+      Get.snackbar("Hata", "Lütfen onay şifresi girin");
+      return;
+    }
 
     isSaving.value = true;
+    final client = GraphQLService.client.value;
 
     try {
-      final result = await client.mutate(MutationOptions(
+      final financeResult = await client.mutate(MutationOptions(
+        document: gql(updateFinanceMutation),
         fetchPolicy: FetchPolicy.noCache,
-        document: gql(updateMutation),
+        onCompleted: (data) {
+          if (data != null) {
+            Get.back(result: true);
+          }
+        },
         variables: {
           "id": id,
           "salary": double.tryParse(salaryController.text) ?? 0,
@@ -65,12 +89,25 @@ class EmployeeDetailController extends GetxController {
         },
       ));
 
-      if (result.hasException) {
-        throw result.exception!;
+      if (financeResult.hasException) {
+        throw financeResult.exception!;
       }
 
-      Get.snackbar("Başarılı", "Çalışan güncellendi");
-      Get.back();
+      final roleResult = await client.mutate(MutationOptions(
+        document: gql(updateRoleMutation),
+        variables: {
+          "id": id,
+          "role": role.value,
+          "password": passwordController.text,
+        },
+      ));
+
+      if (roleResult.hasException) {
+        throw roleResult.exception!;
+      }
+      isSaving.value
+          ? null
+          : Get.snackbar("Başarılı", "Çalışan başarıyla güncellendi");
     } catch (e) {
       Get.snackbar("Hata", "Güncelleme başarısız: $e");
       print("❌ Güncelleme hatası: $e");

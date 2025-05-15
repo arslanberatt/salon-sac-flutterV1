@@ -1,13 +1,14 @@
+import 'dart:async';
+
+import 'package:intl/intl.dart';
 import 'package:mobil/controllers/appointments/appointment_controller.dart';
-import 'package:mobil/screens/common/appointment_loading_screen.dart';
+import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:mobil/screens/customers/add_customer_screen.dart';
+import 'package:mobil/screens/employee/performance_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:mobil/utils/loaders/list_shimmer.dart';
-import 'package:mobil/utils/loaders/loader_appointment.dart';
-import 'package:mobil/utils/loaders/shimmer.dart';
 import '../shared/stat_card.dart';
 import '../shared/check_in_card.dart';
 
@@ -20,7 +21,7 @@ class BossHomeScreen extends StatelessWidget {
 
     final name = "Berat Arslan";
     final hello = "Merhaba,";
-    final gridContainerTitle = "Randevular ve Özet";
+    final gridContainerTitle = "Kısayollar";
 
     final mainColorLight = const Color.fromRGBO(71, 172, 211, 1);
     final mainColorNormal = const Color.fromRGBO(30, 142, 186, 1);
@@ -118,8 +119,9 @@ class BossHomeScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: StatCard(
-                          title: "Randevu",
-                          value: "${controller.appointments.length}",
+                          onTap: () => Get.to(TransactionScreen()),
+                          title: "Kasa",
+                          value: "15000₺",
                           isLoading: controller.loading.value,
                           cardTextColor: whiteColor,
                           icon: Iconsax.empty_wallet,
@@ -132,8 +134,8 @@ class BossHomeScreen extends StatelessWidget {
                       ),
                       Expanded(
                         child: StatCard(
-                          title: "Çalışan",
-                          value: "${controller.employees.length}",
+                          title: "Randevu",
+                          value: "${controller.waitingAppointments.value}",
                           isLoading: controller.loading.value,
                           cardTextColor: blackColor,
                           icon: Iconsax.calendar_search,
@@ -149,8 +151,9 @@ class BossHomeScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: StatCard(
-                          title: "Çalışan",
-                          value: "9 Randevu",
+                          onTap: () => Get.to(PerformanceScreen()),
+                          title: "Performans",
+                          value: "${controller.employees.length} Çalışan",
                           cardTextColor: blackColor,
                           icon: Iconsax.calendar_edit,
                           decoration: generateCardTheme(whiteColor, whiteColor),
@@ -173,40 +176,43 @@ class BossHomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: ProjectSizes.containerPaddingM),
                   Text(
-                    "Bugün Yapılanlar",
+                    "Yaklaşan Randevular",
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: ProjectSizes.containerPaddingS),
-                  ListView(
+                  ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      if (controller.loading.value) LoaderAppointment(),
-                      CheckInCard(
-                        title: "Mert Ahmet Şahin",
-                        customer: "Tuğba Demir",
-                        checkIn: "08:00",
-                        checkOut: "11:15",
-                        duration: "3 saat 15 dk",
-                      ),
-                      const SizedBox(height: ProjectSizes.containerPaddingS),
-                      CheckInCard(
-                        title: "Furkan Şahin",
-                        customer: "Kübranur Demir",
-                        checkIn: "11:00",
-                        checkOut: "12:30",
-                        duration: "1 saat 30 dk",
-                      ),
-                      const SizedBox(height: ProjectSizes.containerPaddingS),
-                      CheckInCard(
-                        title: "Mert Ahmet Şahin",
-                        customer: "Şevval Ümit",
-                        checkIn: "14:00",
-                        checkOut: "15:40",
-                        duration: "1 saat 40 dk",
-                      ),
-                    ],
-                  )
+                    itemCount: controller.filteredAppointments.length,
+                    itemBuilder: (context, index) {
+                      final appt = controller.filteredAppointments[index];
+                      final employee =
+                          controller.getEmployeeName(appt['employeeId']);
+                      final customer =
+                          controller.getCustomerName(appt['customerId']);
+                      final startTime =
+                          controller.formatTime(appt['startTime']);
+                      final endTime = controller.formatTime(appt['endTime']);
+                      final duration = controller.calculateDuration(
+                        appt['startTime'],
+                        appt['endTime'],
+                      );
+
+                      return Column(
+                        children: [
+                          CheckInCard(
+                            title: employee,
+                            customer: customer,
+                            checkIn: startTime,
+                            checkOut: endTime,
+                            duration: duration,
+                          ),
+                          const SizedBox(
+                              height: ProjectSizes.containerPaddingS),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -215,4 +221,16 @@ class BossHomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+String formatTime(String timeString) {
+  final date = DateTime.parse(timeString);
+  return DateFormat.Hm().format(date);
+}
+
+String calculateDuration(String start, String end) {
+  final startTime = DateTime.parse(start);
+  final endTime = DateTime.parse(end);
+  final diff = endTime.difference(startTime);
+  return "${diff.inHours} saat ${diff.inMinutes % 60} dk";
 }

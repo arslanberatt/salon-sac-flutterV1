@@ -5,8 +5,6 @@ import 'package:mobil/controllers/advance/controllers/advance_approval_controlle
 import 'package:mobil/screens/boss/advance_approval_screen.dart';
 import '../../../controllers/employees/employees_controller.dart';
 import '../../../screens/boss/employee_detail_screen.dart';
-import '../../../utils/constants/colors.dart';
-import '../../../utils/constants/sizes.dart';
 
 class EmployeesScreen extends StatelessWidget {
   const EmployeesScreen({super.key});
@@ -44,7 +42,7 @@ class EmployeesScreen extends StatelessWidget {
                   Obx(() {
                     final count =
                         advanceApprovalController.advanceWaitList.length;
-                    if (count == 0) return const SizedBox(); // hiç gösterme
+                    if (count == 0) return const SizedBox();
 
                     return Positioned(
                       right: 6,
@@ -81,105 +79,191 @@ class EmployeesScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (employeeController.employees.isEmpty) {
+        final allEmployees = employeeController.employees;
+        final bosses = allEmployees
+            .where((e) => e["role"]?.toUpperCase() == "PATRON")
+            .toList();
+        final workers = allEmployees
+            .where((e) => e["role"]?.toUpperCase() == "CALISAN")
+            .toList();
+        final guests = allEmployees
+            .where((e) => e["role"]?.toUpperCase() == "MISAFIR")
+            .toList();
+
+        if (allEmployees.isEmpty) {
           return const Center(child: Text("Hiç çalışan bulunamadı."));
         }
 
-        return ListView.builder(
-          itemCount: employeeController.employees.length,
-          itemBuilder: (context, index) {
-            final emp = employeeController.employees[index];
-            return _EmployeeCard(
-              employee: emp,
-              onTap: () => Get.to(() => EmployeeDetailScreen(employee: emp)),
-            );
-          },
+        return ListView(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          children: [
+            if (bosses.isNotEmpty) ...[
+              const SectionTitle(title: "Patronlar"),
+              ...bosses.map((emp) => ZenithProjectCard(
+                    employee: emp,
+                    onTap: () async {
+                      final result = await Get.to(
+                          () => EmployeeDetailScreen(employee: emp));
+                      if (result == true) {
+                        employeeController.fetchEmployees();
+                      }
+                    },
+                  )),
+            ],
+            if (workers.isNotEmpty) ...[
+              const SectionTitle(title: "Çalışanlar"),
+              ...workers.map((emp) => ZenithProjectCard(
+                    employee: emp,
+                    onTap: () async {
+                      final result = await Get.to(
+                          () => EmployeeDetailScreen(employee: emp));
+                      if (result == true) {
+                        employeeController.fetchEmployees();
+                      }
+                    },
+                  )),
+            ],
+            if (guests.isNotEmpty) ...[
+              const SectionTitle(title: "Misafirler"),
+              ...guests.map((emp) => ZenithProjectCard(
+                    employee: emp,
+                    onTap: () async {
+                      final result = await Get.to(
+                          () => EmployeeDetailScreen(employee: emp));
+                      if (result == true) {
+                        employeeController.fetchEmployees();
+                      }
+                    },
+                  )),
+            ],
+          ],
         );
       }),
     );
   }
 }
 
-class _EmployeeCard extends StatelessWidget {
+class SectionTitle extends StatelessWidget {
+  final String title;
+  const SectionTitle({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, left: 16, bottom: 4, right: 16),
+      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+    );
+  }
+}
+
+class ZenithProjectCard extends StatelessWidget {
   final Map<String, dynamic> employee;
   final VoidCallback onTap;
 
-  const _EmployeeCard({
+  const ZenithProjectCard({
+    super.key,
     required this.employee,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final name = employee["name"] ?? "İsimsiz";
-    final phone = employee["phone"] ?? "-";
-    final role = employee["role"] ?? "-";
-    final salary = employee["salary"] ?? 0;
-    final commissionRate = employee["commissionRate"] ?? 0;
-    final advanceBalance = employee["advanceBalance"] ?? 0;
+    final String name = employee["name"] ?? "İsimsiz";
+    final String phone = employee["phone"] ?? "-";
+    final double salary = (employee["salary"] ?? 0).toDouble();
+    final double commissionRate = (employee["commissionRate"] ?? 0).toDouble();
+    final double advanceBalance = (employee["advanceBalance"] ?? 0).toDouble();
+    final String role = employee["role"]?.toUpperCase() ?? "ÇALIŞAN";
+
+    Color badgeColor = Colors.grey;
+    if (role == "PATRON") badgeColor = Colors.orange;
+    if (role == "CALISAN") badgeColor = Colors.blue;
+    if (role == "MISAFIR") badgeColor = Colors.black;
 
     return Card(
       color: Colors.white,
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(ProjectSizes.s),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(ProjectSizes.s),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(ProjectSizes.containerPaddingS),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 👤 Ad ve Rol
+              /// Üst Bilgi
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(name,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(fontWeight: FontWeight.bold)),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: ProjectColors.main2Color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: badgeColor,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            role,
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: Text(role,
+                  ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(
+                          value: commissionRate / 100,
+                          strokeWidth: 4,
+                          backgroundColor: Colors.grey.shade200,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      Text(
+                        "%${commissionRate.toInt()}",
                         style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: ProjectColors.main2Color,
-                        )),
+                            fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              _buildInfoColumn("Telefon", phone),
+              const SizedBox(height: 16),
 
-              // ☎ Telefon
-              Row(
-                children: [
-                  const Icon(Iconsax.call,
-                      size: 16, color: ProjectColors.grayColor),
-                  const SizedBox(width: 6),
-                  Text(phone,
-                      style: const TextStyle(color: ProjectColors.grayColor)),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // 💰 Maaş - 🎁 Prim - 💸 Avans
+              /// Maaş ve Avans
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildInfo("Maaş", "$salary ₺"),
-                  _buildInfo("Prim", "%$commissionRate"),
-                  _buildInfo("Avans", "$advanceBalance ₺"),
+                  _buildInfoColumn("Maaş", "₺${salary.toStringAsFixed(0)}"),
+                  _buildInfoColumn(
+                      "Avans", "₺${advanceBalance.toStringAsFixed(0)}"),
                 ],
               ),
             ],
@@ -189,14 +273,17 @@ class _EmployeeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfo(String label, String value) {
+  Widget _buildInfoColumn(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style:
-                const TextStyle(fontSize: 14, color: ProjectColors.grayColor)),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+        Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        const SizedBox(height: 4),
+        Text(value,
+            style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Colors.black)),
       ],
     );
   }
