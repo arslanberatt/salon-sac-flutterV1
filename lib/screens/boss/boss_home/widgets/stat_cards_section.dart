@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/core/transactions/transaction_controller.dart';
+import 'package:mobil/screens/boss/add_service_screen.dart';
 import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:mobil/screens/customers/add_customer_screen.dart';
-import 'package:mobil/screens/employee/performance_screen.dart';
-import 'package:mobil/screens/shared/stat_card.dart';
+import 'package:mobil/screens/appointment/stat_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
 class StatCardsSection extends StatelessWidget {
@@ -58,19 +58,18 @@ class StatCardsSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: Obx(() => StatCard(
-                    onTap: () => Get.to(PerformanceScreen()),
-                    title: "Performans",
-                    value: "${appointmentController.employees.length} Çalışan",
-                    cardTextColor: Colors.black,
-                    icon: Iconsax.calendar_edit,
-                    decoration: _generateCardTheme(isWhite: true),
-                  )),
-            ),
+                child: StatCard(
+              onTap: () => Get.to(const AddServiceScreen()),
+              title: "Hizmetler",
+              value: "Hizmet Ekle",
+              cardTextColor: Colors.black,
+              icon: Iconsax.heart_add,
+              decoration: _generateCardTheme(isWhite: true),
+            )),
             const SizedBox(width: ProjectSizes.s),
             Expanded(
               child: StatCard(
-                onTap: () => Get.to(AddCustomerScreen()),
+                onTap: () => Get.to(const AddCustomerScreen()),
                 title: "Müşteriler",
                 value: "Müşteri Ekle",
                 cardTextColor: Colors.black,

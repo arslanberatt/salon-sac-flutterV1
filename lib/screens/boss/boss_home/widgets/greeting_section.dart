@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobil/controllers/core/user_session_controller.dart';
 import 'package:mobil/core/user_info_controller.dart';
 import 'package:mobil/screens/customers/add_customer_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
+import 'package:mobil/utils/loaders/shimmer.dart';
 
 class GreetingSection extends StatelessWidget {
-  GreetingSection({super.key});
+  const GreetingSection({super.key, required this.userInfoController});
 
+  final UserInfoController userInfoController;
   final String hello = "Merhaba,";
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(UserInfoController());
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -22,13 +21,15 @@ class GreetingSection extends StatelessWidget {
           children: [
             const SizedBox(height: ProjectSizes.IconM),
             Text(hello, style: Theme.of(context).textTheme.headlineSmall),
-            Obx(() => Text(
-                  controller.name.value,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineLarge
-                      ?.copyWith(fontWeight: FontWeight.w500),
-                )),
+            Obx(() => userInfoController.loading.value
+                ? const ShimmerEffect(width: 100, height: 20)
+                : Text(
+                    userInfoController.name.value.toString(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineLarge
+                        ?.copyWith(fontWeight: FontWeight.w400),
+                  )),
           ],
         ),
         GestureDetector(

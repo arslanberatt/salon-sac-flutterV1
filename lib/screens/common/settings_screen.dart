@@ -10,8 +10,6 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(UserInfoController());
-
-    // Bilgileri yükle
     controller.fetchUserInfo();
 
     return Scaffold(

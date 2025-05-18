@@ -1,6 +1,6 @@
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/screens/common/appointment_loading_screen.dart';
-import 'package:mobil/screens/shared/check_in_card.dart';
+import 'package:mobil/screens/appointment/apointment_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -67,7 +67,7 @@ class AppointmentScreen extends StatelessWidget {
                             final appt = controller.filteredAppointments[index];
                             return Column(
                               children: [
-                                CheckInCard(
+                                AppointmentCard(
                                   title: controller
                                       .getEmployeeName(appt['employeeId']),
                                   customer:

@@ -12,6 +12,12 @@ class UserInfoController extends GetxController {
   var loading = false.obs;
   var isUpdating = false.obs;
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchUserInfo();
+  }
+
   final String getMyInfoQuery = """
     query GetEmployee(\$id: ID!) {
       employee(id: \$id) {

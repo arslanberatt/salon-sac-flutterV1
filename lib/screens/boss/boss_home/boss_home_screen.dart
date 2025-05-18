@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/core/transactions/transaction_controller.dart';
+import 'package:mobil/core/user_info_controller.dart';
 import 'package:mobil/screens/boss/boss_home/widgets/boss_app_bar.dart';
 import 'package:mobil/screens/boss/boss_home/widgets/greeting_section.dart';
 import 'package:mobil/screens/boss/boss_home/widgets/stat_cards_section.dart';
@@ -15,6 +16,7 @@ class BossHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appointmentController = Get.put(AppointmentController());
     final transactionController = Get.put(TransactionController());
+    final userInfoController = Get.put(UserInfoController());
 
     return Scaffold(
       backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
@@ -28,13 +30,17 @@ class BossHomeScreen extends StatelessWidget {
         child: RefreshIndicator(
           onRefresh: () async {
             await appointmentController.fetchAppointments();
+            await transactionController.fetchTransactions();
+            await userInfoController.fetchUserInfo();
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GreetingSection(),
+                GreetingSection(
+                  userInfoController: userInfoController,
+                ),
                 const SizedBox(height: ProjectSizes.containerPaddingL),
                 StatCardsSection(
                   appointmentController: appointmentController,

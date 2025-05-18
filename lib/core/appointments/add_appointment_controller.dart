@@ -137,7 +137,9 @@ class AddAppointmentController extends GetxController {
           'customerId': selectedCustomerId.value,
           'employeeId': selectedEmployeeId.value,
           'serviceIds': selectedServiceIds,
-          'startTime': selectedDateTime.value!.toIso8601String(),
+          'startTime': selectedDateTime.value!
+              .toUtc()
+              .toIso8601String(), // 🔄 GÜNCELLENDİ: UTC formatla gönder
           'totalPrice': totalPrice,
           'notes': notes.value.isEmpty ? null : notes.value,
         },

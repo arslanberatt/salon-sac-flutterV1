@@ -5,11 +5,9 @@ import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
 import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/profile_screen.dart';
-import 'package:mobil/screens/employee/performance_screen.dart';
 import 'package:mobil/screens/employee/salary_record_screen.dart';
 import 'package:mobil/screens/boss/service_list_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
-import 'package:mobil/screens/boss/transaction_widgets/transaction_action_buttons.dart';
 import 'package:get/get.dart';
 import '../screens/common/splash_screen.dart';
 import '../screens/common/login_screen.dart';
@@ -48,6 +46,5 @@ class AppRoutes {
     GetPage(name: salaryRecord, page: () => const SalaryRecordScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: settings, page: () => const SettingsScreen()),
-    GetPage(name: performance, page: () => const PerformanceScreen()),
   ];
 }
