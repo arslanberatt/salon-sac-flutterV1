@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/appointments/update_appointment_controller.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class AppointmentStatusActions extends StatelessWidget {
   final String appointmentId;
@@ -19,6 +20,7 @@ class AppointmentStatusActions extends StatelessWidget {
     if (status == "tamamlandi" || status == "iptal") return const SizedBox();
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Toplam Fiyat (₺)",
             style: TextStyle(fontWeight: FontWeight.w500)),
@@ -41,9 +43,8 @@ class AppointmentStatusActions extends StatelessWidget {
                   controller.updateAppointmentStatus(appointmentId, "iptal");
                   Navigator.pop(context);
                 },
-                icon: const Icon(Icons.cancel_outlined, color: Colors.red),
-                label:
-                    const Text("İptal Et", style: TextStyle(color: Colors.red)),
+                label: const Text("Randevu iptali",
+                    style: TextStyle(color: Colors.red)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   side: const BorderSide(color: Colors.red),
@@ -56,7 +57,10 @@ class AppointmentStatusActions extends StatelessWidget {
                 onPressed: () {
                   final price = double.tryParse(priceController.text.trim());
                   if (price == null) {
-                    Get.snackbar("Hata", "Geçerli bir fiyat girin.");
+                    CustomSnackBar.errorSnackBar(
+                      title: "Hata",
+                      message: "Lütfen geçerli bir fiyat girin.",
+                    );
                     return;
                   }
                   controller.updateAppointmentStatus(

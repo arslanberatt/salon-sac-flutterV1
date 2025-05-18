@@ -1,6 +1,6 @@
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/screens/common/appointment_loading_screen.dart';
-import 'package:mobil/screens/appointment/apointment_card.dart';
+import 'package:mobil/screens/appointments/apointment_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -40,11 +40,13 @@ class AppointmentScreen extends StatelessWidget {
           child: Column(
             children: [
               TableCalendar(
+                locale: 'tr_TR',
                 focusedDay: controller.selectedDate.value,
                 firstDay: DateTime.utc(2025, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
                 calendarFormat: CalendarFormat.week,
                 startingDayOfWeek: StartingDayOfWeek.monday,
+                headerVisible: false,
                 selectedDayPredicate: (day) =>
                     isSameDay(controller.selectedDate.value, day),
                 onDaySelected: (selectedDay, focusedDay) {
@@ -77,7 +79,7 @@ class AppointmentScreen extends StatelessWidget {
                                   checkOut:
                                       controller.formatTime(appt['endTime']),
                                   duration:
-                                      "${controller.calculateDuration(appt['startTime'], appt['endTime'])} dk",
+                                      "${controller.calculateDuration(appt['startTime'], appt['endTime'])}",
                                   appointmentId: appt['id'],
                                   services: controller
                                       .getServicesByIds(appt['serviceIds']),

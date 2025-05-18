@@ -5,7 +5,6 @@ import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 
 class AddCustomerController extends GetxController {
-  // Form ve kontroller
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final notesController = TextEditingController();
@@ -29,8 +28,10 @@ class AddCustomerController extends GetxController {
 
     // Ön kontrol
     if (name.isEmpty || phone.isEmpty) {
-      Get.snackbar("Hata", "Ad ve telefon alanları zorunludur.",
-          snackPosition: SnackPosition.BOTTOM);
+      CustomSnackBar.errorSnackBar(
+        title: "Hata",
+        message: "Ad ve telefon numarası boş olamaz.",
+      );
       return;
     }
 

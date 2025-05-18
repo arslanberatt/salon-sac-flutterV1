@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/appointments/update_appointment_controller.dart';
-import 'package:mobil/screens/appointment/appointment_status_actions.dart';
+import 'package:mobil/screens/appointments/appointment_status_actions.dart';
 import 'package:mobil/screens/appointments/edit_appointment_screen.dart';
 
 void showAppointmentDetailModal(

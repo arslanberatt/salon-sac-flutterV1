@@ -1,93 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/customers/add_customer_controller.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 
 class AddCustomerScreen extends StatelessWidget {
-  const AddCustomerScreen({super.key});
+  AddCustomerScreen({super.key});
+  final customerController = Get.put(AddCustomerController());
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AddCustomerController());
-    final _formKey = GlobalKey<FormState>();
-
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text("Müşteri Ekle")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              /// Ad Soyad
-              TextFormField(
-                controller: controller.nameController,
-                decoration: const InputDecoration(
-                  labelText: "Ad Soyad",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Ad boş olamaz";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              /// Telefon
-              TextFormField(
-                controller: controller.phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: "Telefon",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return "Telefon boş olamaz";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              /// Notlar
-              TextFormField(
-                controller: controller.notesController,
-                decoration: const InputDecoration(
-                  labelText: "Notlar (Opsiyonel)",
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 24),
-
-              /// Kaydet Butonu
-              Obx(() => SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade600,
-                      ),
-                      onPressed: controller.isSaving.value
-                          ? null
-                          : () async {
-                              if (_formKey.currentState!.validate()) {
-                                await controller.addCustomer();
-                                Get.snackbar("Başarılı", "Müşteri eklendi");
-                              }
-                            },
-                      child: controller.isSaving.value
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text("Kaydet"),
-                    ),
-                  )),
-            ],
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          "Müşteri Ekle",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Domine',
           ),
         ),
       ),
+      body: Obx(() {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Yeni Müşteri",
+                  style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: ProjectSizes.spaceBtwItems),
+              TextFormField(
+                controller: customerController.nameController,
+                decoration: const InputDecoration(labelText: "Ad Soyad"),
+              ),
+              const SizedBox(height: ProjectSizes.spaceBtwItems),
+              TextFormField(
+                controller: customerController.phoneController,
+                decoration: const InputDecoration(labelText: "Telefon"),
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: ProjectSizes.spaceBtwItems),
+              TextFormField(
+                controller: customerController.notesController,
+                decoration: const InputDecoration(labelText: "Not (opsiyonel)"),
+                maxLines: 2,
+              ),
+              const SizedBox(height: ProjectSizes.spaceBtwItems),
+              customerController.isSaving.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : SizedBox(
+                      width: double.infinity,
+                      height: ProjectSizes.containerPaddingXL,
+                      child: ElevatedButton(
+                        onPressed: customerController.addCustomer,
+                        child: const Text("Müşteri Ekle"),
+                      ),
+                    ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

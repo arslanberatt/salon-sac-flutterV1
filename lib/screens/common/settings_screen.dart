@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/core/user_info_controller.dart';
 import 'package:mobil/screens/common/password_change_screen.dart';
+import 'package:mobil/screens/common/privacy_policy_screen.dart';
 import 'package:mobil/screens/common/profile_edit_screen.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+  static const String surumNotu = "- Şuan ilk sürümü kullanıyorsunuz.\n";
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +18,15 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Ayarlar"),
         centerTitle: true,
+        elevation: 0,
+        title: const Text(
+          "Ayarlar",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Domine',
+          ),
+        ),
       ),
       body: Obx(() {
         if (controller.loading.value) {
@@ -23,22 +34,20 @@ class SettingsScreen extends StatelessWidget {
         }
 
         return ListView(
-          padding: const EdgeInsets.all(16),
           children: [
-            // 👤 Kullanıcı Bilgisi Kartı
             Container(
-              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 children: [
                   const CircleAvatar(
                     backgroundImage: AssetImage("assets/images/employee.png"),
-                    radius: 32,
+                    radius: 30,
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,81 +55,96 @@ class SettingsScreen extends StatelessWidget {
                         Text(
                           controller.name.value,
                           style: const TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        Text("Rol: ${controller.role.value}"),
                         Text("Email: ${controller.email.value}"),
                         Text("Telefon: ${controller.phone.value}"),
-                        Text("Kayıt: ${controller.createdAt.value}"),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+            SizedBox(
+              height: 16,
+            ),
+            _buildItem(Icons.person_outline, "Profil Bilgilerini Güncelle", () {
+              Get.to(() => const ProfileEditScreen());
+            }),
+            _buildDivider(),
 
-            const SizedBox(height: 32),
+            _buildItem(Icons.lock_outline, "Şifreyi Değiştir", () {
+              Get.to(() => const PasswordChangeScreen());
+            }),
+            _buildDivider(),
 
-            // ⚙️ Ayarlar Seçenekleri
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: const Text("Profil Bilgilerini Güncelle"),
-              onTap: () {
-                Get.to(() => const ProfileEditScreen());
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock_outline),
-              title: const Text("Şifreyi Değiştir"),
-              onTap: () {
-                Get.to(() => const PasswordChangeScreen());
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.article_outlined),
-              title: const Text("Sürüm Notları"),
-              subtitle: const Text("Yenilikleri keşfet"),
-              onTap: () {
-                Get.defaultDialog(
-                  title: "Sürüm Notları",
-                  content: const Text(
-                    "- Yeni randevu ekranı\n- Hata düzeltmeleri\n- Performans iyileştirmeleri",
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.support_agent),
-              title: const Text("İletişim"),
-              subtitle: const Text("Bize ulaşın"),
-              onTap: () {
-                Get.snackbar("İletişim", "Destek e-posta: destek@ornek.com");
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.privacy_tip_outlined),
-              title: const Text("Gizlilik ve Kullanım Koşulları"),
-              onTap: () {
-                Get.toNamed("/privacy");
-              },
-            ),
+            _buildItem(Icons.article_outlined, "Sürüm Notları", () {
+              Get.defaultDialog(
+                backgroundColor: Colors.white,
+                titleStyle: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                radius: 10,
+                titlePadding: const EdgeInsets.only(top: 16),
+                title: "Sürüm Notları",
+                content: const Text(
+                  surumNotu,
+                ),
+              );
+            }),
+            _buildDivider(),
 
-            const SizedBox(height: 32),
-            Center(
-              child: TextButton.icon(
-                onPressed: () => Get.offAllNamed("/login"),
-                icon: const Icon(Icons.logout, color: Colors.red),
-                label: const Text("Çıkış Yap",
-                    style: TextStyle(color: Colors.red)),
+            _buildItem(Icons.support_agent, "İletişim", () {
+              CustomSnackBar.warningSnackBar(
+                title: "İletişim",
+                message: "İletişim için:"
+                    "Email: arslanberattdev@gmail.com",
+              );
+            }),
+            _buildDivider(),
+
+            _buildItem(
+                Icons.privacy_tip_outlined, "Gizlilik ve Kullanım Koşulları",
+                () {
+              Get.to(() => const PrivacyPolicyScreen());
+            }),
+            _buildDivider(),
+
+            // 🚪 Çıkış
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: const Text(
+                  "Çıkış Yap",
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () => Get.find<UserSessionController>().logoutUser(),
               ),
             ),
-            const SizedBox(height: 16),
-            const Center(
-                child: Text("Sürüm: v1.0.0",
-                    style: TextStyle(color: Colors.grey))),
           ],
         );
       }),
     );
   }
+
+  Widget _buildItem(IconData icon, String title, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(title),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _buildDivider() => const Divider(
+        height: 1,
+        thickness: 0.6,
+        endIndent: 40,
+        indent: 40,
+      );
 }

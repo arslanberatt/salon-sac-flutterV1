@@ -15,7 +15,18 @@ class AddAppointmentScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text("Randevu Ekle")),
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          "Randevu Ekle",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Domine',
+          ),
+        ),
+      ),
       body: Obx(() {
         if (controller.loading.value) {
           return const Center(child: AppointmentLoadingScreen());
@@ -183,12 +194,6 @@ class AddAppointmentScreen extends StatelessWidget {
                                           ? Get.find<AppointmentController>()
                                           : null;
                                   appointmentController?.fetchAppointments();
-                                  Get.snackbar(
-                                      "Başarılı", "Randevu oluşturuldu");
-                                  Get.offAllNamed('/forRefresh');
-                                } else {
-                                  Get.snackbar(
-                                      "Hata", "Randevu oluşturulamadı");
                                 }
                               },
                         child: controller.loading.value

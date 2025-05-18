@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
-import 'package:mobil/screens/appointment/apointment_card.dart';
+import 'package:mobil/screens/appointments/apointment_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:mobil/utils/loaders/loader_appointment.dart';
 

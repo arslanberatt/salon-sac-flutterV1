@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:mobil/screens/appointment/appointment_detail_modal.dart';
+import 'package:mobil/screens/appointments/appointment_detail_modal.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
 class AppointmentCard extends StatelessWidget {
@@ -44,6 +44,7 @@ class AppointmentCard extends StatelessWidget {
         status: status,
       ),
       child: Card(
+        color: Colors.white,
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(ProjectSizes.containerPaddingS),

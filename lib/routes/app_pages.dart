@@ -1,12 +1,12 @@
 import 'package:mobil/screens/appointments/add_appointment_screen.dart';
-import 'package:mobil/screens/boss/add_service_screen.dart';
+import 'package:mobil/screens/boss/manage_service_screen.dart';
 import 'package:mobil/screens/boss/advance_approval_screen.dart';
 import 'package:mobil/screens/boss/transaction_screen.dart';
+import 'package:mobil/screens/common/privacy_policy_screen.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
 import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/profile_screen.dart';
 import 'package:mobil/screens/employee/salary_record_screen.dart';
-import 'package:mobil/screens/boss/service_list_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
 import 'package:get/get.dart';
 import '../screens/common/splash_screen.dart';
@@ -30,14 +30,14 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String performance = '/performance';
+  static const String privacyPolicy = '/privacy-policy';
 
   static final List<GetPage> routes = [
     GetPage(name: splash, page: () => SplashScreen()),
     GetPage(name: login, page: () => LoginScreen()),
     GetPage(name: main, page: () => const MainLayout()),
-    GetPage(name: addCustomer, page: () => const AddCustomerScreen()),
-    GetPage(name: addService, page: () => const AddServiceScreen()),
-    GetPage(name: listService, page: () => const ServiceListScreen()),
+    GetPage(name: addCustomer, page: () => AddCustomerScreen()),
+    GetPage(name: addService, page: () => ManageServicesScreen()),
     GetPage(name: addAppointment, page: () => const AddAppointmentScreen()),
     GetPage(name: employees, page: () => const EmployeesScreen()),
     GetPage(name: advanceRequests, page: () => const RequestAdvanceScreen()),
@@ -46,5 +46,6 @@ class AppRoutes {
     GetPage(name: salaryRecord, page: () => const SalaryRecordScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: settings, page: () => const SettingsScreen()),
+    GetPage(name: privacyPolicy, page: () => const PrivacyPolicyScreen()),
   ];
 }

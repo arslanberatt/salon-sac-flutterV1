@@ -1,5 +1,7 @@
 // ✅ UserSessionController - Oturum yönetimi (ID, ad, rol)
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:mobil/utils/services/graphql_service.dart';
 
 class UserSessionController extends GetxController {
   final id = ''.obs;
@@ -26,5 +28,17 @@ class UserSessionController extends GetxController {
   void clear() {
     id.value = '';
     role.value = '';
+  }
+
+  Future<void> logoutUser() async {
+    final session = Get.find<UserSessionController>();
+    session.clear(); // Session sıfırla
+
+    const storage = FlutterSecureStorage();
+    await storage.delete(key: "token"); // Token’ı sil
+
+    await GraphQLService.refreshClient(); // Token’sız client oluştur
+
+    Get.offAllNamed("/login"); // Giriş ekranına yönlendir
   }
 }

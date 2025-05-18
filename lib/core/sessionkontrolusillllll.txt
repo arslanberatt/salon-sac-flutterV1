@@ -1,8 +1,0 @@
-final session = Get.find<UserSessionController>();
-
-if (session.isPatron) {
-  // patron işlemleri
-}
-
-print("Kullanıcı adı: ${session.name.value}");
-print("Rol: ${session.role.value}");

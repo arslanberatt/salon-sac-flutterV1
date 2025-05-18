@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mobil/core/core/user_session_controller.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 
 class UserInfoController extends GetxController {
@@ -62,11 +63,6 @@ class UserInfoController extends GetxController {
         ),
       );
 
-      if (result.hasException) {
-        Get.snackbar("Hata", result.exception.toString());
-        return;
-      }
-
       final data = result.data?["employee"];
       if (data != null) {
         name.value = data["name"];
@@ -76,7 +72,10 @@ class UserInfoController extends GetxController {
         createdAt.value = data["createdAt"];
       }
     } catch (e) {
-      Get.snackbar("Hata", "Bilgi alınamadı: $e");
+      CustomSnackBar.errorSnackBar(
+        title: "Hata",
+        message: "Bilgileri alırken bir hata oluştu: $e",
+      );
     } finally {
       loading.value = false;
     }
@@ -100,11 +99,19 @@ class UserInfoController extends GetxController {
             "phone": newPhone,
             "password": newPassword,
           },
+          onCompleted: (data) => Get.back(result: true),
+          fetchPolicy: FetchPolicy.noCache,
         ),
       );
 
       if (result.hasException) {
-        Get.snackbar("Hata", result.exception!.graphqlErrors.first.message);
+        final errorMessage =
+            result.exception?.graphqlErrors.map((e) => e.message).join(", ") ??
+                "Güncelleme başarısız.";
+        CustomSnackBar.errorSnackBar(
+          title: "Hata",
+          message: errorMessage,
+        );
         return;
       }
 
@@ -115,10 +122,16 @@ class UserInfoController extends GetxController {
         email.value = updated["email"];
         role.value = updated["role"];
         createdAt.value = updated["createdAt"];
-        Get.snackbar("Başarılı", "Bilgiler güncellendi.");
+        CustomSnackBar.successSnackBar(
+          title: "Başarılı",
+          message: "Bilgiler başarıyla güncellendi.",
+        );
       }
     } catch (e) {
-      Get.snackbar("Hata", "Güncelleme başarısız: $e");
+      CustomSnackBar.errorSnackBar(
+        title: "Hata",
+        message: "Güncelleme başarısız: $e",
+      );
     } finally {
       isUpdating.value = false;
     }

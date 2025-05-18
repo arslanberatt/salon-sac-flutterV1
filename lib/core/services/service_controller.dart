@@ -1,12 +1,13 @@
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 
 class ServiceController extends GetxController {
   final services = <Map<String, dynamic>>[].obs;
   final loading = false.obs;
 
-  final String servicesQuery = """
+  final String getServicesQuery = """
     query {
       services {
         id
@@ -17,22 +18,27 @@ class ServiceController extends GetxController {
     }
   """;
 
-  void fetchServices() async {
+  Future<void> fetchServices() async {
     loading.value = true;
-
     final client = GraphQLService.client.value;
+
     final result = await client.query(QueryOptions(
-        document: gql(servicesQuery), fetchPolicy: FetchPolicy.noCache));
+      document: gql(getServicesQuery),
+      fetchPolicy: FetchPolicy.noCache,
+    ));
 
     loading.value = false;
 
     if (result.hasException) {
-      print("❌ Hata: ${result.exception}");
+      CustomSnackBar.errorSnackBar(
+        title: "Hata",
+        message: "Hizmetler alınamadı",
+      );
       services.clear();
       return;
     }
 
-    services.value = List<Map<String, dynamic>>.from(result.data!['services']);
+    services.value = List<Map<String, dynamic>>.from(result.data?['services']);
   }
 
   @override

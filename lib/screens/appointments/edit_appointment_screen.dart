@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:intl/intl.dart'; // ✅ Tarih formatı için gerekli
+import 'package:intl/intl.dart';
 import 'package:mobil/core/appointments/edit_appointment_controller.dart';
 
 class EditAppointmentScreen extends StatefulWidget {
@@ -102,11 +102,7 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
                                 final success =
                                     await controller.updateAppointment();
                                 if (success) {
-                                  Get.snackbar(
-                                      "Başarılı", "Randevu güncellendi");
                                   Get.offAllNamed('/forRefresh');
-                                } else {
-                                  Get.snackbar("Hata", "Güncelleme başarısız");
                                 }
                               },
                         icon: const Icon(Iconsax.save_2),

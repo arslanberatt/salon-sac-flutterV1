@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/core/transactions/transaction_controller.dart';
-import 'package:mobil/screens/boss/add_service_screen.dart';
+import 'package:mobil/screens/boss/manage_service_screen.dart';
 import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:mobil/screens/customers/add_customer_screen.dart';
-import 'package:mobil/screens/appointment/stat_card.dart';
+import 'package:mobil/screens/appointments/stat_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
 class StatCardsSection extends StatelessWidget {
@@ -33,8 +33,9 @@ class StatCardsSection extends StatelessWidget {
                     onTap: () => Get.to(TransactionScreen()),
                     title: "Kasa",
                     value: (transactionController.totalIncome -
-                            transactionController.totalExpense)
-                        .toStringAsFixed(0),
+                                transactionController.totalExpense)
+                            .toStringAsFixed(0) +
+                        "TL",
                     isLoading: appointmentController.loading.value,
                     cardTextColor: Colors.white,
                     icon: Iconsax.empty_wallet,
@@ -44,8 +45,9 @@ class StatCardsSection extends StatelessWidget {
             const SizedBox(width: ProjectSizes.s),
             Expanded(
               child: Obx(() => StatCard(
-                    title: "Randevu",
-                    value: "${appointmentController.waitingAppointments.value}",
+                    title: "Aktif Randevu",
+                    value:
+                        "${appointmentController.waitingAppointments.value} adet",
                     isLoading: appointmentController.loading.value,
                     cardTextColor: Colors.black,
                     icon: Iconsax.calendar_search,
@@ -59,17 +61,17 @@ class StatCardsSection extends StatelessWidget {
           children: [
             Expanded(
                 child: StatCard(
-              onTap: () => Get.to(const AddServiceScreen()),
+              onTap: () => Get.to(() => ManageServicesScreen()),
               title: "Hizmetler",
               value: "Hizmet Ekle",
               cardTextColor: Colors.black,
-              icon: Iconsax.heart_add,
+              icon: Iconsax.setting_2,
               decoration: _generateCardTheme(isWhite: true),
             )),
             const SizedBox(width: ProjectSizes.s),
             Expanded(
               child: StatCard(
-                onTap: () => Get.to(const AddCustomerScreen()),
+                onTap: () => Get.to(AddCustomerScreen()),
                 title: "Müşteriler",
                 value: "Müşteri Ekle",
                 cardTextColor: Colors.black,
