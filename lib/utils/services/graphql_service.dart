@@ -12,8 +12,8 @@ class GraphQLService {
       getToken: () async => token != null ? 'Bearer $token' : null,
     );
 
-    final httpLink =
-        HttpLink('http://10.0.2.2:8000/graphql'); // veya senin endpoint’in
+    final httpLink = HttpLink(
+        'https://salonsacserver-production-3b83.up.railway.app/graphql');
 
     final link = authLink.concat(httpLink);
 
@@ -26,7 +26,7 @@ class GraphQLService {
   static final ValueNotifier<GraphQLClient> client = ValueNotifier(
     GraphQLClient(
       link: HttpLink(
-          'http://10.0.2.2:8000/graphql'), // geçici, yukarıda init'te dinamik olacak
+          'https://salonsacserver-production-3b83.up.railway.app/graphql'),
       cache: GraphQLCache(store: HiveStore()),
     ),
   );
