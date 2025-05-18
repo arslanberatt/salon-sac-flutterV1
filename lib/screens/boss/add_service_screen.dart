@@ -1,7 +1,7 @@
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/services/add_service_controller.dart';
+import '../../core/services/add_service_controller.dart';
 
 class AddServiceScreen extends StatelessWidget {
   const AddServiceScreen({super.key});

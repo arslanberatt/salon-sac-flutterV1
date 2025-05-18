@@ -9,6 +9,8 @@ class AppointmentController extends GetxController {
   final appointments = <Map<String, dynamic>>[].obs;
   final employees = <Map<String, dynamic>>[].obs;
   final customers = <Map<String, dynamic>>[].obs;
+  final services = <Map<String, dynamic>>[].obs;
+
   final loading = false.obs;
   final selectedDate = DateTime.now().obs;
   final waitingAppointments = 0.obs;
@@ -23,6 +25,7 @@ class AppointmentController extends GetxController {
         notes
         employeeId
         customerId
+        serviceIds
       }
     }
   """;
@@ -47,10 +50,20 @@ class AppointmentController extends GetxController {
     }
   """;
 
-  void fetchAppointments() async {
+  final String servicesQuery = """
+  query {
+    services {
+      id
+      title
+      duration
+      price
+    }
+  }
+""";
+
+  Future<void> fetchAppointments() async {
     loading.value = true;
     final client = GraphQLService.client.value;
-    final session = Get.find<UserSessionController>();
 
     try {
       final appointmentResult = await client.query(
@@ -67,6 +80,16 @@ class AppointmentController extends GetxController {
         QueryOptions(
             document: gql(customersQuery), fetchPolicy: FetchPolicy.noCache),
       );
+
+      final serviceResult = await client.query(
+        QueryOptions(
+            document: gql(servicesQuery), fetchPolicy: FetchPolicy.noCache),
+      );
+
+      if (serviceResult.hasException) {
+        print("❌ Service query hatası: ${serviceResult.exception}");
+        return;
+      }
 
       if (appointmentResult.hasException) {
         print("❌ Appointment query hatası: ${appointmentResult.exception}");
@@ -93,6 +116,10 @@ class AppointmentController extends GetxController {
       final allCustomers =
           List<Map<String, dynamic>>.from(customerResult.data!['customers']);
 
+      final allServices =
+          List<Map<String, dynamic>>.from(serviceResult.data!['services']);
+
+      services.value = allServices;
       customers.value = allCustomers;
       employees.value = allEmployees;
 
@@ -136,6 +163,10 @@ class AppointmentController extends GetxController {
 
   void setSelectedDate(DateTime date) {
     selectedDate.value = date;
+  }
+
+  List<Map<String, dynamic>> getServicesByIds(List<dynamic> ids) {
+    return services.where((s) => ids.contains(s['id'])).toList();
   }
 
   List<Map<String, dynamic>> get filteredAppointments {
@@ -190,5 +221,18 @@ class AppointmentController extends GetxController {
     } catch (_) {
       return "-";
     }
+  }
+
+  List<Map<String, dynamic>> get todayAppointments {
+    final now = DateTime.now();
+    return appointments.where((appt) {
+      final apptDate = appt['startTime'] is int
+          ? DateTime.fromMillisecondsSinceEpoch(appt['startTime']).toLocal()
+          : DateTime.fromMillisecondsSinceEpoch(int.parse(appt['startTime']))
+              .toLocal();
+      return apptDate.year == now.year &&
+          apptDate.month == now.month &&
+          apptDate.day == now.day;
+    }).toList();
   }
 }

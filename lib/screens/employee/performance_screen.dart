@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobil/controllers/employees/performance_controller.dart';
+import 'package:mobil/core/employees/performance_controller.dart';
 
 class PerformanceScreen extends StatelessWidget {
   const PerformanceScreen({super.key});

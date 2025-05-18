@@ -1,4 +1,4 @@
-import 'package:mobil/controllers/auth/auth_controller.dart';
+import 'package:mobil/core/auth/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/utils/constants/sizes.dart';

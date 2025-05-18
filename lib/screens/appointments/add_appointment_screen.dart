@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:mobil/controllers/appointments/appointment_controller.dart';
+import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/screens/common/appointment_loading_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
-import '../../controllers/appointments/add_appointment_controller.dart';
+import '../../core/appointments/add_appointment_controller.dart';
 
 class AddAppointmentScreen extends StatelessWidget {
   const AddAppointmentScreen({super.key});

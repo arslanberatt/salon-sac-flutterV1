@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobil/controllers/advance/controllers/advance_approval_controller.dart';
+import 'package:mobil/core/advance/controllers/advance_approval_controller.dart';
 import 'package:mobil/utils/constants/colors.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:mobil/utils/loaders/loader_advance.dart';

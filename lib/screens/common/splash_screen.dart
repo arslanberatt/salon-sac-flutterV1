@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:lottie/lottie.dart';
-import 'package:mobil/controllers/core/user_session_controller.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
@@ -36,12 +36,10 @@ class SplashScreen extends StatelessWidget {
       final session = Get.find<UserSessionController>();
       session.setUser(
         userId: id,
-        userName: "",
         userRole: role,
       );
 
       print("🔁 Splash üzerinden oturum güncellendi:");
-      session.printSessionInfo();
 
       if (role == "patron" || role == "calisan") {
         Get.offAllNamed('/main');

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobil/controllers/customers/add_customer_controller.dart';
+import 'package:mobil/core/customers/add_customer_controller.dart';
 
 class AddCustomerScreen extends StatelessWidget {
   const AddCustomerScreen({super.key});

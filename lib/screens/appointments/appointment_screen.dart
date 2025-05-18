@@ -1,6 +1,5 @@
-import 'package:mobil/controllers/appointments/appointment_controller.dart';
+import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/screens/common/appointment_loading_screen.dart';
-import 'package:mobil/screens/common/splash_screen.dart';
 import 'package:mobil/screens/shared/check_in_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +31,7 @@ class AppointmentScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.loading.value) {
-          return AppointmentLoadingScreen();
+          return const AppointmentLoadingScreen();
         }
 
         return Padding(
@@ -58,28 +57,38 @@ class AppointmentScreen extends StatelessWidget {
               Expanded(
                 child: controller.filteredAppointments.isEmpty
                     ? const Center(child: Text("Bu tarihte randevu yok."))
-                    : ListView.builder(
-                        itemCount: controller.filteredAppointments.length,
-                        itemBuilder: (context, index) {
-                          final appt = controller.filteredAppointments[index];
-                          return Column(
-                            children: [
-                              CheckInCard(
-                                title: controller
-                                    .getEmployeeName(appt['employeeId']),
-                                customer:
-                                    "Müşteri: ${controller.getCustomerName(appt['customerId'])}",
-                                checkIn:
-                                    controller.formatTime(appt['startTime']),
-                                checkOut:
-                                    controller.formatTime(appt['endTime']),
-                                duration: appt['status'],
-                              ),
-                              const SizedBox(
-                                  height: ProjectSizes.containerPaddingS),
-                            ],
-                          );
+                    : RefreshIndicator(
+                        onRefresh: () async {
+                          await controller.fetchAppointments();
                         },
+                        child: ListView.builder(
+                          itemCount: controller.filteredAppointments.length,
+                          itemBuilder: (context, index) {
+                            final appt = controller.filteredAppointments[index];
+                            return Column(
+                              children: [
+                                CheckInCard(
+                                  title: controller
+                                      .getEmployeeName(appt['employeeId']),
+                                  customer:
+                                      "Müşteri: ${controller.getCustomerName(appt['customerId'])}",
+                                  checkIn:
+                                      controller.formatTime(appt['startTime']),
+                                  checkOut:
+                                      controller.formatTime(appt['endTime']),
+                                  duration:
+                                      "${controller.calculateDuration(appt['startTime'], appt['endTime'])} dk",
+                                  appointmentId: appt['id'],
+                                  services: controller
+                                      .getServicesByIds(appt['serviceIds']),
+                                  status: appt['status'],
+                                ),
+                                const SizedBox(
+                                    height: ProjectSizes.containerPaddingS),
+                              ],
+                            );
+                          },
+                        ),
                       ),
               ),
             ],

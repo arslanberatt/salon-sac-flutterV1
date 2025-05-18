@@ -1,6 +1,7 @@
 import 'package:mobil/screens/appointments/add_appointment_screen.dart';
 import 'package:mobil/screens/boss/add_service_screen.dart';
 import 'package:mobil/screens/boss/advance_approval_screen.dart';
+import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
 import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/profile_screen.dart';
@@ -8,7 +9,7 @@ import 'package:mobil/screens/employee/performance_screen.dart';
 import 'package:mobil/screens/employee/salary_record_screen.dart';
 import 'package:mobil/screens/boss/service_list_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
-import 'package:mobil/screens/boss/transaction_screen.dart';
+import 'package:mobil/screens/boss/transaction_widgets/transaction_action_buttons.dart';
 import 'package:get/get.dart';
 import '../screens/common/splash_screen.dart';
 import '../screens/common/login_screen.dart';

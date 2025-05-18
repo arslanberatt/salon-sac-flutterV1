@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:mobil/controllers/advance/controllers/advance_approval_controller.dart';
+import 'package:mobil/core/advance/controllers/advance_approval_controller.dart';
 import 'package:mobil/screens/boss/advance_approval_screen.dart';
-import '../../../controllers/employees/employees_controller.dart';
+import '../../core/employees/employees_controller.dart';
 import '../../../screens/boss/employee_detail_screen.dart';
 
 class EmployeesScreen extends StatelessWidget {

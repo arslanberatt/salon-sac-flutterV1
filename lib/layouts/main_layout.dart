@@ -1,9 +1,8 @@
-import 'package:mobil/controllers/core/user_session_controller.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/screens/appointments/appointment_screen.dart';
-import 'package:mobil/screens/boss/boss_home_screen.dart';
-import 'package:mobil/screens/boss/employees_screen.dart'; // yeni sayfa
+import 'package:mobil/screens/boss/boss_home/boss_home_screen.dart';
+import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
-import 'package:mobil/screens/employee/performance_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +29,7 @@ class _MainLayoutState extends State<MainLayout> {
     const BossHomeScreen(),
     const AppointmentScreen(),
     const EmployeesScreen(),
-    const PerformanceScreen(),
+    SettingsScreen(),
   ];
 
   @override

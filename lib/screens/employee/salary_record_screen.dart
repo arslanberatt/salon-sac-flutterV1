@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/salary/salary_record_controller.dart';
+import '../../core/salary/salary_record_controller.dart';
 
 class SalaryRecordScreen extends StatelessWidget {
   const SalaryRecordScreen({super.key});

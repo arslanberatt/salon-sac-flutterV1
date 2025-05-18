@@ -157,7 +157,6 @@ class AddAppointmentController extends GetxController {
     }
   }
 
-  /// --- Temizleme / Reset ---
   void clearForm() {
     selectedCustomerId.value = '';
     selectedEmployeeId.value = '';
@@ -167,7 +166,6 @@ class AddAppointmentController extends GetxController {
     customerNameController.clear();
   }
 
-  /// --- Lifecycle ---
   @override
   void onInit() {
     super.onInit();

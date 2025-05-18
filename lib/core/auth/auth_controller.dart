@@ -1,3 +1,4 @@
+// ✅ AuthController - Giriş işlemi ve session kaydı
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -31,7 +32,6 @@ class AuthController extends GetxController {
     }
 
     loading.value = true;
-    print("🔐 Giriş işlemi başlatıldı...");
 
     try {
       final client = GraphQLService.client.value;
@@ -45,45 +45,36 @@ class AuthController extends GetxController {
       ));
 
       if (result.hasException) {
-        print("❌ Giriş hatası: ${result.exception}");
         Get.snackbar(
-            "Giriş Başarısız", result.exception!.graphqlErrors.first.message);
+          "Giriş Başarısız",
+          result.exception!.graphqlErrors.first.message,
+        );
         return;
       }
 
       final token = result.data!["loginEmployee"]["token"];
       final employee = result.data!["loginEmployee"]["employee"];
 
-      print("✅ Token alındı");
-      print("👤 Kullanıcı: ${employee["name"]}, Rol: ${employee["role"]}");
-
-      // Token'ı güvenli sakla
       await storage.write(key: "token", value: token);
-
-      // Yeni token ile GraphQL client'ı yenile
       await GraphQLService.refreshClient();
 
-      // Oturumu güncelle
       final session = Get.find<UserSessionController>();
+
+      session.name.value = employee["name"];
+      print(session.name.value);
+
       session.setUser(
         userId: employee["id"],
-        userName: employee["name"],
         userRole: employee["role"],
       );
 
-      print(
-          "🧠 Session => ID: ${session.id.value}, Rol: ${session.role.value}");
-
-      // Role göre yönlendirme
       if (session.isPatron || session.isEmployee) {
         Get.offAllNamed('/main');
       } else {
         Get.snackbar("Beklemede", "Hesabınız henüz onaylanmamış.");
         Get.offAllNamed('/login');
       }
-    } catch (e, stacktrace) {
-      print("❌ Login Exception: $e");
-      print("📍 Stacktrace: $stacktrace");
+    } catch (e) {
       Get.snackbar("Hata", "Bir şeyler ters gitti. $e");
     } finally {
       loading.value = false;

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:lottie/lottie.dart';
 import 'package:get/get.dart';
-import 'package:mobil/controllers/core/user_session_controller.dart';
-import 'package:mobil/controllers/appointments/appointment_controller.dart';
-import 'package:mobil/controllers/employees/employees_controller.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
+import 'package:mobil/core/appointments/appointment_controller.dart';
+import 'package:mobil/core/employees/employees_controller.dart';
 
 class AppointmentLoadingScreen extends StatelessWidget {
   const AppointmentLoadingScreen({super.key});
@@ -16,7 +15,6 @@ class AppointmentLoadingScreen extends StatelessWidget {
     if (session.role.value.isEmpty) {
       session.setUser(
         userId: "temporary",
-        userName: "Geçici Kullanıcı",
         userRole: "calisan",
       );
       Get.snackbar("Hata", "Veriler yüklenemedi");
@@ -25,8 +23,8 @@ class AppointmentLoadingScreen extends StatelessWidget {
 
     try {
       await Future.wait([
-        Get.find<EmployeesController>().fetchEmployees(),
-        Get.find<AppointmentController>().fetchAppointments(),
+        Get.put(EmployeesController()).fetchEmployees(),
+        Get.put(AppointmentController()).fetchAppointments(),
       ] as Iterable<Future>);
 
       Get.offAllNamed('/main');

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/employees/employee_detail_controller.dart';
+import '../../core/employees/employee_detail_controller.dart';
 
 class EmployeeDetailScreen extends StatelessWidget {
   final Map<String, dynamic> employee;

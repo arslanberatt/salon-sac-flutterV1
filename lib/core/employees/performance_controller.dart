@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:mobil/controllers/appointments/appointment_controller.dart';
+import 'package:mobil/core/appointments/appointment_controller.dart';
 
 class PerformanceController extends GetxController {
   final currentMonthStats = <Map<String, dynamic>>[].obs;
