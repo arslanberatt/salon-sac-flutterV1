@@ -1,12 +1,13 @@
-import 'package:mobil/core/core/user_session_controller.dart';
-import 'package:mobil/screens/appointments/appointment_screen.dart';
-import 'package:mobil/screens/boss/boss_home/boss_home_screen.dart';
-import 'package:mobil/screens/boss/employees_screen.dart';
-import 'package:mobil/screens/common/settings_screen.dart';
-import 'package:mobil/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
+import 'package:mobil/screens/appointments/appointment_screen.dart';
+import 'package:mobil/screens/boss/home/boss_home_screen.dart';
+import 'package:mobil/screens/boss/employees_screen.dart';
+import 'package:mobil/screens/common/settings_screen.dart';
+import 'package:mobil/screens/employee/home/employee_home_screen.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -25,30 +26,48 @@ class _MainLayoutState extends State<MainLayout> {
     });
   }
 
-  static final List<Widget> _screens = [
-    const BossHomeScreen(),
-    const AppointmentScreen(),
-    const EmployeesScreen(),
-    SettingsScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final bool isPatron = session.isPatron;
+
+    // Rol bazlı ekran listesi
+    final List<Widget> screens = isPatron
+        ? const [
+            BossHomeScreen(),
+            AppointmentScreen(),
+            EmployeesScreen(),
+            SettingsScreen(),
+          ]
+        : const [
+            EmployeeHomeScreen(),
+            AppointmentScreen(),
+            SettingsScreen(),
+          ];
+
+    // Rol bazlı navigation bar item listesi
+    final List<Widget> navItems = isPatron
+        ? [
+            buildNavBarItem(Iconsax.main_component, 'Anasayfa', 0),
+            buildNavBarItem(Iconsax.calendar_1, 'Randevu', 1),
+            const SizedBox(width: ProjectSizes.IconM),
+            buildNavBarItem(Iconsax.user_search, 'Çalışanlar', 2),
+            buildNavBarItem(Iconsax.setting_2, 'Ayarlar', 3),
+          ]
+        : [
+            buildNavBarItem(Iconsax.main_component, 'Anasayfa', 0),
+            buildNavBarItem(Iconsax.calendar_1, 'Randevu', 1),
+            const SizedBox(width: ProjectSizes.IconM),
+            buildNavBarItem(Iconsax.wallet_1, 'Avans Talebi', 2),
+            buildNavBarItem(Iconsax.setting_2, 'Ayarlar', 2),
+          ];
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screens[_currentIndex],
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            buildNavBarItem(Iconsax.main_component, 'Anasayfa', 0),
-            buildNavBarItem(Iconsax.calendar_1, 'Randevu', 1),
-            const SizedBox(
-              width: ProjectSizes.IconM,
-            ),
-            buildNavBarItem(Iconsax.user_search, 'Çalışanlar', 2),
-            buildNavBarItem(Iconsax.setting_2, 'Ayarlar', 3),
-          ],
+          children: navItems,
         ),
       ),
       floatingActionButton: ClipOval(
@@ -83,10 +102,10 @@ class _MainLayoutState extends State<MainLayout> {
         children: [
           Icon(
             icon,
-            size: isSelected ? 28 : 24, // büyüklük farkı
+            size: isSelected ? 28 : 24,
             color: isSelected
                 ? const Color.fromRGBO(30, 142, 186, 1)
-                : Colors.grey.shade700, // renk farkı
+                : Colors.grey.shade700,
           ),
           Text(
             label,

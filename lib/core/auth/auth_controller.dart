@@ -45,10 +45,18 @@ class AuthController extends GetxController {
       ));
 
       if (result.hasException) {
-        Get.snackbar(
-          "Giriş Başarısız",
-          result.exception!.graphqlErrors.first.message,
-        );
+        final graphqlErrors = result.exception!.graphqlErrors;
+        final linkException = result.exception!.linkException;
+
+        if (graphqlErrors.isNotEmpty) {
+          Get.snackbar("Giriş Başarısız", graphqlErrors.first.message);
+        } else if (linkException != null) {
+          Get.snackbar("Ağ Hatası", linkException.toString());
+        } else {
+          Get.snackbar("Hata", "Bilinmeyen bir hata oluştu.");
+        }
+
+        print("⚠️ GraphQL Exception: ${result.exception.toString()}");
         return;
       }
 

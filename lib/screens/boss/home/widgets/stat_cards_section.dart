@@ -6,7 +6,7 @@ import 'package:mobil/core/transactions/transaction_controller.dart';
 import 'package:mobil/screens/boss/manage_service_screen.dart';
 import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:mobil/screens/customers/add_customer_screen.dart';
-import 'package:mobil/screens/appointments/stat_card.dart';
+import 'package:mobil/screens/employee/stat_card.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
 class StatCardsSection extends StatelessWidget {

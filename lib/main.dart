@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mobil/core/core/user_session_controller.dart';
-import 'package:mobil/core/transactions/transaction_controller.dart';
 import 'package:mobil/utils/services/graphql_service.dart';
 import 'package:mobil/utils/theme/theme.dart';
 import 'routes/app_pages.dart';
@@ -28,11 +27,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: MyThemes.lightTheme,
       locale: const Locale('tr', 'TR'),
-      supportedLocales: [
-        const Locale('tr', 'TR'),
-        const Locale('en', 'US'),
+      supportedLocales: const [
+        Locale('tr', 'TR'),
+        Locale('en', 'US'),
       ],
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
