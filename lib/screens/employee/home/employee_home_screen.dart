@@ -104,13 +104,10 @@ class EmployeeHomeScreen extends StatelessWidget {
                               children: [
                                 AppointmentCard(
                                   status: appt['status'] ?? "bilinmiyor",
-                                  title: appointmentController.getEmployeeName(
-                                          appt['employeeId']) ??
-                                      "-",
-                                  customer:
-                                      appointmentController.getCustomerName(
-                                              appt['customerId']) ??
-                                          "-",
+                                  title: appointmentController
+                                      .getEmployeeName(appt['employeeId']),
+                                  customer: appointmentController
+                                      .getCustomerName(appt['customerId']),
                                   checkIn: appointmentController
                                       .formatTime(appt['startTime']),
                                   checkOut: appointmentController

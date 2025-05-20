@@ -45,8 +45,8 @@ class _AppointmentList extends StatelessWidget {
               const EdgeInsets.only(bottom: ProjectSizes.containerPaddingS),
           child: AppointmentCard(
             status: appt['status'] ?? "bilinmiyor",
-            title: controller.getEmployeeName(appt['employeeId']) ?? "-",
-            customer: controller.getCustomerName(appt['customerId']) ?? "-",
+            title: controller.getEmployeeName(appt['employeeId']),
+            customer: controller.getCustomerName(appt['customerId']),
             checkIn: controller.formatTime(appt['startTime']),
             checkOut: controller.formatTime(appt['endTime']),
             duration: controller.calculateDuration(

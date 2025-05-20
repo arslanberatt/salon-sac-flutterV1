@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:mobil/screens/boss/employee_detail_screen.dart';
-import 'package:mobil/screens/boss/employees_screen.dart';
 import '../../utils/services/graphql_service.dart';
 
 class EmployeeDetailController extends GetxController {

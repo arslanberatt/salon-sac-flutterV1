@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/user_info_controller.dart';
 import 'package:mobil/screens/common/profile_edit_screen.dart';
-import 'package:mobil/screens/customers/add_customer_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:mobil/utils/loaders/shimmer.dart';
 

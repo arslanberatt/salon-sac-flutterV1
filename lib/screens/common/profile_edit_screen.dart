@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/user_info_controller.dart';
 import 'package:mobil/utils/constants/sizes.dart';
-import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class ProfileEditScreen extends StatelessWidget {
   const ProfileEditScreen({super.key});
