@@ -13,6 +13,10 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final session = Get.find<UserSessionController>();
+    Future.delayed(Duration.zero, () {
+      session.autoLogoutIfGuest();
+    });
     final controller = Get.put(UserInfoController());
     controller.fetchUserInfo();
 

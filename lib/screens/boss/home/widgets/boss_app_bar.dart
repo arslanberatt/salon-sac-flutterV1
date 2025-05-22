@@ -1,30 +1,54 @@
 import 'package:flutter/material.dart';
 
-class BossAppBar extends StatelessWidget {
+class BossAppBar extends StatelessWidget implements PreferredSizeWidget {
   const BossAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      centerTitle: true,
-      backgroundColor: Colors.grey[100],
-      elevation: 0,
-      leading: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: Image.asset(
-            "assets/images/logo.jpg",
-            height: 40,
-            width: 40,
-            fit: BoxFit.cover,
+      toolbarHeight: 90,
+      backgroundColor: Colors.white,
+      elevation: 4,
+      automaticallyImplyLeading: false,
+      titleSpacing: 0,
+      flexibleSpace: const SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: CircleAvatar(
+                  radius: 26,
+                  backgroundImage: AssetImage("assets/images/logo.jpg"),
+                ),
+              ),
+              Center(
+                child: Text(
+                  "SALON SAÇ",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                    fontFamily: 'Teko',
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: SizedBox(
+                  width: 52,
+                ),
+              ),
+            ],
           ),
         ),
       ),
-      title: const Text(
-        "SALON SAÇ",
-        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Domine'),
-      ),
     );
   }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(90);
 }

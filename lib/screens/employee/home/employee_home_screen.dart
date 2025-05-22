@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/core/user_info_controller.dart';
 import 'package:mobil/screens/appointments/apointment_card.dart';
 import 'package:mobil/screens/boss/home/widgets/boss_app_bar.dart';
@@ -17,6 +18,10 @@ class EmployeeHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final session = Get.find<UserSessionController>();
+    Future.delayed(Duration.zero, () {
+      session.autoLogoutIfGuest();
+    });
     final appointmentController = Get.put(AppointmentController());
     final userInfoController = Get.put(UserInfoController());
 

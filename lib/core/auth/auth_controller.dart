@@ -67,20 +67,23 @@ class AuthController extends GetxController {
       await GraphQLService.refreshClient();
 
       final session = Get.find<UserSessionController>();
-
       session.name.value = employee["name"];
-      print(session.name.value);
-
       session.setUser(
         userId: employee["id"],
         userRole: employee["role"],
       );
 
+      // 🔥 MISAFIR ROL KONTROLÜ
+      if (employee["role"] == "misafir") {
+        Get.snackbar("Yetkisiz", "Hesabınız henüz onaylanmamış.");
+        await storage.delete(key: "token");
+        Get.offAllNamed('/login');
+        return;
+      }
+
+      // ROL BAZLI YÖNLENDİRME
       if (session.isPatron || session.isEmployee) {
         Get.offAllNamed('/main');
-      } else {
-        Get.snackbar("Beklemede", "Hesabınız henüz onaylanmamış.");
-        Get.offAllNamed('/login');
       }
     } catch (e) {
       Get.snackbar("Hata", "Bir şeyler ters gitti. $e");

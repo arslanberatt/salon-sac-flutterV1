@@ -94,49 +94,68 @@ class EmployeesScreen extends StatelessWidget {
           return const Center(child: Text("Hiç çalışan bulunamadı."));
         }
 
-        return ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          children: [
-            if (bosses.isNotEmpty) ...[
-              const SectionTitle(title: "Patronlar"),
-              ...bosses.map((emp) => ZenithProjectCard(
-                    employee: emp,
-                    onTap: () async {
-                      final result = await Get.to(
-                          () => EmployeeDetailScreen(employee: emp));
-                      if (result == true) {
-                        employeeController.fetchEmployees();
-                      }
-                    },
-                  )),
+        return RefreshIndicator(
+          onRefresh: employeeController.fetchEmployees,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            children: [
+              if (bosses.isNotEmpty) ...[
+                const SectionTitle(title: "Patronlar"),
+                ...bosses.map((emp) => ZenithProjectCard(
+                      employee: emp,
+                      onTap: () async {
+                        final result = await Get.to(
+                            () => EmployeeDetailScreen(employee: emp));
+                        if (result is Map<String, dynamic>) {
+                          final index = employeeController.employees
+                              .indexWhere((e) => e["id"] == result["id"]);
+                          if (index != -1) {
+                            employeeController.employees[index] = result;
+                            employeeController.employees.refresh();
+                          }
+                        }
+                      },
+                    )),
+              ],
+              if (workers.isNotEmpty) ...[
+                const SectionTitle(title: "Çalışanlar"),
+                ...workers.map((emp) => ZenithProjectCard(
+                      employee: emp,
+                      onTap: () async {
+                        final result = await Get.to(
+                            () => EmployeeDetailScreen(employee: emp));
+                        if (result is Map<String, dynamic>) {
+                          final index = employeeController.employees
+                              .indexWhere((e) => e["id"] == result["id"]);
+                          if (index != -1) {
+                            employeeController.employees[index] = result;
+                            employeeController.employees.refresh();
+                          }
+                        }
+                      },
+                    )),
+              ],
+              if (guests.isNotEmpty) ...[
+                const SectionTitle(title: "Misafirler"),
+                ...guests.map((emp) => ZenithProjectCard(
+                      employee: emp,
+                      onTap: () async {
+                        final result = await Get.to(
+                            () => EmployeeDetailScreen(employee: emp));
+                        if (result is Map<String, dynamic>) {
+                          final index = employeeController.employees
+                              .indexWhere((e) => e["id"] == result["id"]);
+                          if (index != -1) {
+                            employeeController.employees[index] = result;
+                            employeeController.employees.refresh();
+                          }
+                        }
+                      },
+                    )),
+              ],
             ],
-            if (workers.isNotEmpty) ...[
-              const SectionTitle(title: "Çalışanlar"),
-              ...workers.map((emp) => ZenithProjectCard(
-                    employee: emp,
-                    onTap: () async {
-                      final result = await Get.to(
-                          () => EmployeeDetailScreen(employee: emp));
-                      if (result == true) {
-                        employeeController.fetchEmployees();
-                      }
-                    },
-                  )),
-            ],
-            if (guests.isNotEmpty) ...[
-              const SectionTitle(title: "Misafirler"),
-              ...guests.map((emp) => ZenithProjectCard(
-                    employee: emp,
-                    onTap: () async {
-                      final result = await Get.to(
-                          () => EmployeeDetailScreen(employee: emp));
-                      if (result == true) {
-                        employeeController.fetchEmployees();
-                      }
-                    },
-                  )),
-            ],
-          ],
+          ),
         );
       }),
     );
@@ -193,7 +212,6 @@ class ZenithProjectCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Üst Bilgi
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -256,8 +274,6 @@ class ZenithProjectCard extends StatelessWidget {
               ),
               _buildInfoColumn("Telefon", phone),
               const SizedBox(height: 16),
-
-              /// Maaş ve Avans
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

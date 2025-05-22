@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobil/screens/boss/home/widgets/boss_app_bar.dart';
 import 'package:mobil/screens/boss/transaction_widgets/transaction_action_buttons.dart';
 import 'package:mobil/screens/boss/transaction_widgets/transaction_list.dart';
 import 'package:mobil/screens/boss/transaction_widgets/transaction_summary_card.dart';
@@ -25,13 +26,9 @@ class TransactionScreen extends StatelessWidget {
 
       return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          centerTitle: true,
-          title: const Text("Birikim Hedefi",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: BossAppBar(),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/core/customers/add_customer_controller.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
@@ -9,17 +10,24 @@ class AddCustomerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final session = Get.find<UserSessionController>();
+    Future.delayed(Duration.zero, () {
+      session.autoLogoutIfGuest();
+    });
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          "Müşteri Ekle",
+          "SALON SAÇ",
           style: TextStyle(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Domine',
+            letterSpacing: 1.2,
+            fontFamily: 'Teko',
+            color: Colors.black87,
           ),
         ),
       ),
@@ -46,7 +54,6 @@ class AddCustomerScreen extends StatelessWidget {
               TextFormField(
                 controller: customerController.notesController,
                 decoration: const InputDecoration(labelText: "Not (opsiyonel)"),
-                maxLines: 2,
               ),
               const SizedBox(height: ProjectSizes.spaceBtwItems),
               customerController.isSaving.value

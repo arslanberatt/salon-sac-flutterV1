@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/core/user_info_controller.dart';
 
 class PasswordChangeScreen extends StatelessWidget {
@@ -7,6 +8,10 @@ class PasswordChangeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final session = Get.find<UserSessionController>();
+    Future.delayed(Duration.zero, () {
+      session.autoLogoutIfGuest();
+    });
     final controller = Get.find<UserInfoController>();
     final passwordController = TextEditingController();
     final confirmController = TextEditingController();

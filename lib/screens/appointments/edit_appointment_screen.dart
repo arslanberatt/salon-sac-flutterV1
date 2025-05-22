@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:mobil/core/appointments/edit_appointment_controller.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 
 class EditAppointmentScreen extends StatefulWidget {
   final String appointmentId;
@@ -24,7 +25,22 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Randevuyu Güncelle")),
+      backgroundColor: Color.fromARGB(249, 255, 255, 255),
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          "SALON SAÇ",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            fontFamily: 'Teko',
+            color: Colors.black87,
+          ),
+        ),
+      ),
       body: Obx(() {
         if (controller.loading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -35,18 +51,23 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                /// 📝 Not (editable)
+                const SizedBox(height: ProjectSizes.spaceBtwItems),
+                Row(
+                  children: [
+                    Text("Yeni Müşteri",
+                        style: Theme.of(context).textTheme.titleLarge),
+                  ],
+                ),
+                const SizedBox(height: ProjectSizes.spaceBtwItems),
                 TextFormField(
                   controller: controller.notesController,
                   decoration: const InputDecoration(
                     labelText: "Not (Opsiyonel)",
                     border: OutlineInputBorder(),
                   ),
-                  maxLines: 2,
                 ),
                 const SizedBox(height: 16),
 
-                /// 🕒 Başlangıç Zamanı (editable)
                 Obx(() => ListTile(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -105,7 +126,6 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
                                   Get.offAllNamed('/forRefresh');
                                 }
                               },
-                        icon: const Icon(Iconsax.save_2),
                         label: controller.loading.value
                             ? const CircularProgressIndicator(
                                 color: Colors.white)

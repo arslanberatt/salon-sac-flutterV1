@@ -20,7 +20,7 @@ class EmployeesController extends GetxController {
     }
   """;
 
-  void fetchEmployees() async {
+  Future<void> fetchEmployees() async {
     loading.value = true;
     final client = GraphQLService.client.value;
 

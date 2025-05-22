@@ -7,6 +7,7 @@ import 'package:mobil/screens/boss/home/widgets/boss_app_bar.dart';
 import 'package:mobil/screens/boss/home/widgets/greeting_section.dart';
 import 'package:mobil/screens/boss/home/widgets/stat_cards_section.dart';
 import 'package:mobil/screens/boss/home/widgets/upcoming_appointments_section.dart';
+import 'package:mobil/utils/constants/colors.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
 class BossHomeScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class BossHomeScreen extends StatelessWidget {
     final userInfoController = Get.put(UserInfoController());
 
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(245, 245, 245, 1),
+      backgroundColor: ProjectColors.backColor,
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: BossAppBar(),

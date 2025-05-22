@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -48,7 +50,20 @@ class AddCustomerController extends GetxController {
             "notes": notes.isEmpty ? null : notes,
           },
           fetchPolicy: FetchPolicy.noCache,
-          onCompleted: (data) => Get.back(result: true)));
+          onCompleted: (data) {
+            // ✅ INPUT ALANLARINI TEMİZLE
+            nameController.clear();
+            phoneController.clear();
+            notesController.clear();
+
+            Get.back(result: true);
+          },
+          onError: (error) {
+            CustomSnackBar.errorSnackBar(
+              title: "Hata",
+              message: "Müşteri eklenirken hata oluştu: ",
+            );
+          }));
 
       if (result.hasException) {
         throw result.exception!;

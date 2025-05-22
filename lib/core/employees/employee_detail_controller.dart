@@ -7,12 +7,12 @@ class EmployeeDetailController extends GetxController {
   final String id;
   final name = ''.obs;
   final phone = ''.obs;
+  final role = ''.obs;
 
   final salaryController = TextEditingController();
   final commissionController = TextEditingController();
   final advanceController = TextEditingController();
   final passwordController = TextEditingController();
-  final role = ''.obs;
 
   final isSaving = false.obs;
 
@@ -60,6 +60,46 @@ class EmployeeDetailController extends GetxController {
     }
   """;
 
+  final String getEmployeeQuery = """
+    query GetEmployee(\$id: ID!) {
+      employee(id: \$id) {
+        id
+        name
+        phone
+        salary
+        commissionRate
+        advanceBalance
+        role
+      }
+    }
+  """;
+
+  Future<void> fetchEmployeeDetails() async {
+    final client = GraphQLService.client.value;
+
+    final result = await client.query(QueryOptions(
+      document: gql(getEmployeeQuery),
+      variables: {"id": id},
+      fetchPolicy: FetchPolicy.noCache,
+    ));
+
+    if (result.hasException) {
+      print("❌ Çalışan bilgisi alınamadı: ${result.exception}");
+      Get.snackbar("Hata", "Çalışan bilgisi alınamadı.");
+      return;
+    }
+
+    final data = result.data?["employee"];
+    if (data != null) {
+      name.value = data["name"];
+      phone.value = data["phone"];
+      salaryController.text = data["salary"].toString();
+      commissionController.text = data["commissionRate"].toString();
+      advanceController.text = data["advanceBalance"].toString();
+      role.value = data["role"];
+    }
+  }
+
   Future<void> updateEmployee() async {
     if (passwordController.text.trim().isEmpty) {
       Get.snackbar("Hata", "Lütfen onay şifresi girin");
@@ -73,11 +113,6 @@ class EmployeeDetailController extends GetxController {
       final financeResult = await client.mutate(MutationOptions(
         document: gql(updateFinanceMutation),
         fetchPolicy: FetchPolicy.noCache,
-        onCompleted: (data) {
-          if (data != null) {
-            Get.back(result: true);
-          }
-        },
         variables: {
           "id": id,
           "salary": double.tryParse(salaryController.text) ?? 0,
@@ -85,6 +120,7 @@ class EmployeeDetailController extends GetxController {
           "advanceBalance": double.tryParse(advanceController.text) ?? 0,
           "password": passwordController.text,
         },
+        onCompleted: (data) => Get.back(result: true),
       ));
 
       if (financeResult.hasException) {
@@ -93,6 +129,7 @@ class EmployeeDetailController extends GetxController {
 
       final roleResult = await client.mutate(MutationOptions(
         document: gql(updateRoleMutation),
+        fetchPolicy: FetchPolicy.noCache,
         variables: {
           "id": id,
           "role": role.value,
@@ -103,15 +140,21 @@ class EmployeeDetailController extends GetxController {
       if (roleResult.hasException) {
         throw roleResult.exception!;
       }
-      isSaving.value
-          ? null
-          : Get.snackbar("Başarılı", "Çalışan başarıyla güncellendi");
+
+      Get.snackbar("Başarılı", "Çalışan başarıyla güncellendi");
+      Get.back(result: true);
     } catch (e) {
       Get.snackbar("Hata", "Güncelleme başarısız: $e");
       print("❌ Güncelleme hatası: $e");
     } finally {
       isSaving.value = false;
     }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchEmployeeDetails(); // Sayfa açıldığında ilk veriyi yükle
   }
 
   @override

@@ -8,7 +8,10 @@ import 'package:flutter/material.dart';
 class MyThemes {
   static final lightTheme = ThemeData(
       brightness: Brightness.light,
-      primaryColor: Colors.blue,
+      primaryColor: Colors.black,
+      colorScheme: ColorScheme.light(
+        primary: Colors.black,
+      ),
       useMaterial3: true,
       scaffoldBackgroundColor: ProjectColors.back1Color,
       appBarTheme: CustomAppbarThemes.appBarTheme,

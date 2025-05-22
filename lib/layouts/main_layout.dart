@@ -20,6 +20,15 @@ class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
   final session = Get.find<UserSessionController>();
 
+  @override
+  void initState() {
+    super.initState();
+    // Uygulama açıldığında misafir kontrolü
+    Future.delayed(Duration.zero, () {
+      session.autoLogoutIfGuest();
+    });
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -30,7 +39,6 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final bool isPatron = session.isPatron;
 
-    // Rol bazlı ekran listesi
     final List<Widget> screens = isPatron
         ? const [
             BossHomeScreen(),
@@ -44,7 +52,6 @@ class _MainLayoutState extends State<MainLayout> {
             SettingsScreen(),
           ];
 
-    // Rol bazlı navigation bar item listesi
     final List<Widget> navItems = isPatron
         ? [
             buildNavBarItem(Iconsax.main_component, 'Anasayfa', 0),

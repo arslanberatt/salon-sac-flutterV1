@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/core/appointments/appointment_controller.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
+import 'package:mobil/utils/services/graphql_service.dart';
 import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
-import '../../utils/services/graphql_service.dart';
 
 class AddAppointmentController extends GetxController {
   /// --- UI Kontrolleri ---
@@ -20,40 +22,12 @@ class AddAppointmentController extends GetxController {
   final selectedServiceIds = <String>[].obs;
   final selectedDateTime = Rxn<DateTime>();
   final notes = ''.obs;
-
-  /// --- Durum ---
   final loading = false.obs;
 
-  /// --- Queries ---
-  final String customersQuery = """
-    query {
-      customers {
-        id
-        name
-      }
-    }
-  """;
+  /// --- Ayar ---
+  final allowGlobalAppointments = true.obs;
 
-  final String employeesQuery = """
-    query {
-      employees {
-        id
-        name
-      }
-    }
-  """;
-
-  final String servicesQuery = """
-    query {
-      services {
-        id
-        title
-        duration
-        price
-      }
-    }
-  """;
-
+  /// --- GraphQL Mutasyonu ---
   final String addAppointmentMutation = """
     mutation AddAppointment(
       \$customerId: ID!
@@ -76,38 +50,37 @@ class AddAppointmentController extends GetxController {
     }
   """;
 
-  /// --- Toplamlar ---
-  double get totalPrice {
-    return services
-        .where((s) => selectedServiceIds.contains(s['id']))
-        .fold(0.0, (sum, item) => sum + (item['price'] as num).toDouble());
-  }
+  /// --- Hesaplamalar ---
+  double get totalPrice => services
+      .where((s) => selectedServiceIds.contains(s['id']))
+      .fold(0.0, (sum, item) => sum + (item['price'] as num).toDouble());
 
-  int get totalDuration {
-    return services
-        .where((s) => selectedServiceIds.contains(s['id']))
-        .fold(0, (sum, item) => sum + (item['duration'] as int));
-  }
+  int get totalDuration => services
+      .where((s) => selectedServiceIds.contains(s['id']))
+      .fold(0, (sum, item) => sum + (item['duration'] as int));
 
-  /// --- Veri çekme ---
-  void fetchAllData() async {
+  /// --- Tüm verileri çek ---
+  Future<void> fetchAllData() async {
     loading.value = true;
     final client = GraphQLService.client.value;
 
     try {
-      final c = await client.query(QueryOptions(
-          document: gql(customersQuery), fetchPolicy: FetchPolicy.noCache));
-      final e = await client.query(QueryOptions(
-          document: gql(employeesQuery), fetchPolicy: FetchPolicy.noCache));
-      final s = await client.query(QueryOptions(
-          document: gql(servicesQuery), fetchPolicy: FetchPolicy.noCache));
+      final results = await Future.wait([
+        client.query(
+            QueryOptions(document: gql("""query { customers { id name } }"""))),
+        client.query(QueryOptions(
+            document: gql("""query { employees { id name role } }"""))),
+        client.query(QueryOptions(
+            document:
+                gql("""query { services { id title duration price } }"""))),
+      ]);
 
       customers.value =
-          List<Map<String, dynamic>>.from(c.data?['customers'] ?? []);
+          List<Map<String, dynamic>>.from(results[0].data?['customers'] ?? []);
       employees.value =
-          List<Map<String, dynamic>>.from(e.data?['employees'] ?? []);
+          List<Map<String, dynamic>>.from(results[1].data?['employees'] ?? []);
       services.value =
-          List<Map<String, dynamic>>.from(s.data?['services'] ?? []);
+          List<Map<String, dynamic>>.from(results[2].data?['services'] ?? []);
     } catch (e) {
       print("❌ Veri çekme hatası: $e");
     } finally {
@@ -115,16 +88,86 @@ class AddAppointmentController extends GetxController {
     }
   }
 
-  /// --- Randevu gönderme ---
+  /// --- Yetki kontrolü ---
+  bool canBookForOthers(String userId) {
+    if (allowGlobalAppointments.value) return true;
+    if (selectedEmployeeId.value == userId) return true;
+
+    final user = employees.firstWhereOrNull((e) => e['id'] == userId);
+    if (user != null && user['role'] == 'patron') return true;
+
+    CustomSnackBar.errorSnackBar(
+      title: "Yetki Yok",
+      message: "Sadece kendiniz için randevu oluşturabilirsiniz.",
+    );
+    return false;
+  }
+
+  /// --- Çakışma ve günlük randevu kontrolü ---
+  Future<bool> hasConflictOrDuplicate() async {
+    final client = GraphQLService.client.value;
+    final start = selectedDateTime.value!;
+    final end = start.add(Duration(minutes: totalDuration));
+
+    final result = await client.query(QueryOptions(
+      document: gql(
+          """query { appointments { employeeId customerId startTime endTime status } }"""),
+    ));
+
+    final appointments =
+        List<Map<String, dynamic>>.from(result.data?['appointments'] ?? [])
+            .where((a) => a['status'] == 'bekliyor')
+            .toList();
+
+    final conflict = appointments.any((a) {
+      if (a['employeeId'] != selectedEmployeeId.value) return false;
+      final aStart = DateTime.parse(a['startTime']).toUtc();
+      final aEnd = DateTime.parse(a['endTime']).toUtc();
+      return start.toUtc().isBefore(aEnd) && start.toUtc().isAfter(aStart);
+    });
+
+    if (conflict) {
+      CustomSnackBar.errorSnackBar(
+        title: "Çalışan Meşgul",
+        message: "Seçilen saatte başka bir randevusu var.",
+      );
+      return true;
+    }
+
+    final sameDay = appointments.any((a) {
+      if (a['customerId'] != selectedCustomerId.value) return false;
+      final aStart = DateTime.parse(a['startTime']).toUtc();
+      return aStart.year == start.year &&
+          aStart.month == start.month &&
+          aStart.day == start.day;
+    });
+
+    if (sameDay) {
+      CustomSnackBar.errorSnackBar(
+        title: "Zaten Randevulu",
+        message: "Bu müşteriye o gün zaten randevu alınmış.",
+      );
+      return true;
+    }
+
+    return false;
+  }
+
+  /// --- Randevu oluştur ---
   Future<bool> submitAppointment() async {
+    final session = Get.find<UserSessionController>();
+
     if (selectedCustomerId.isEmpty ||
         selectedEmployeeId.isEmpty ||
         selectedServiceIds.isEmpty ||
         selectedDateTime.value == null) {
       CustomSnackBar.errorSnackBar(
-          title: "Hatalı Kayıt!", message: "Lütfen tüm alanları doldurunuz.");
+          title: "Eksik Bilgi", message: "Tüm alanları doldurun.");
       return false;
     }
+
+    if (!canBookForOthers(session.id.value)) return false;
+    if (await hasConflictOrDuplicate()) return false;
 
     loading.value = true;
     final client = GraphQLService.client.value;
@@ -132,24 +175,27 @@ class AddAppointmentController extends GetxController {
     try {
       final result = await client.mutate(MutationOptions(
         document: gql(addAppointmentMutation),
-        fetchPolicy: FetchPolicy.noCache,
         variables: {
           'customerId': selectedCustomerId.value,
           'employeeId': selectedEmployeeId.value,
           'serviceIds': selectedServiceIds,
-          'startTime': selectedDateTime.value!
-              .toUtc()
-              .toIso8601String(), // 🔄 GÜNCELLENDİ: UTC formatla gönder
+          'startTime': selectedDateTime.value!.toUtc().toIso8601String(),
           'totalPrice': totalPrice,
           'notes': notes.value.isEmpty ? null : notes.value,
         },
+        onCompleted: (data) => Get.back(result: true),
       ));
 
       if (result.hasException) {
-        print("❌ Randevu oluşturma hatası: ${result.exception}");
+        print("❌ Hata: ${result.exception}");
+        CustomSnackBar.errorSnackBar(
+            title: "Hata", message: "Randevu oluşturulamadı.");
         return false;
       }
 
+      CustomSnackBar.successSnackBar(
+          title: "Başarılı", message: "Randevu oluşturuldu.");
+      Get.find<AppointmentController>().fetchAppointments(); // otomatik yenile
       return true;
     } catch (e) {
       print("❌ Submit error: $e");
@@ -159,19 +205,14 @@ class AddAppointmentController extends GetxController {
     }
   }
 
-  void clearForm() {
-    selectedCustomerId.value = '';
-    selectedEmployeeId.value = '';
-    selectedServiceIds.clear();
-    selectedDateTime.value = null;
-    notes.value = '';
-    customerNameController.clear();
-  }
-
   @override
   void onInit() {
     super.onInit();
     fetchAllData();
+    final session = Get.find<UserSessionController>();
+    if (!allowGlobalAppointments.value) {
+      selectedEmployeeId.value = session.id.value;
+    }
   }
 
   @override

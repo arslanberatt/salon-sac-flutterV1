@@ -1,12 +1,17 @@
 import 'package:mobil/core/advance/controllers/advance_request_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobil/core/core/user_session_controller.dart';
 
 class RequestAdvanceScreen extends StatelessWidget {
   const RequestAdvanceScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final session = Get.find<UserSessionController>();
+    Future.delayed(Duration.zero, () {
+      session.autoLogoutIfGuest();
+    });
     final controller = Get.put(RequestAdvanceController());
 
     return Scaffold(

@@ -1,6 +1,7 @@
-// ✅ UserSessionController - Oturum yönetimi (ID, ad, rol)
+import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mobil/utils/services/graphql_service.dart';
 
 class UserSessionController extends GetxController {
@@ -16,7 +17,7 @@ class UserSessionController extends GetxController {
   void setUser({
     required String userId,
     required String userRole,
-    String? userName, // <-- eklendi
+    String? userName,
   }) {
     id.value = userId;
     role.value = userRole;
@@ -31,14 +32,41 @@ class UserSessionController extends GetxController {
   }
 
   Future<void> logoutUser() async {
-    final session = Get.find<UserSessionController>();
-    session.clear(); // Session sıfırla
-
+    clear(); // Session sıfırla
     const storage = FlutterSecureStorage();
     await storage.delete(key: "token"); // Token’ı sil
+    await GraphQLService.refreshClient(); // Yeni (anonim) client
+    Get.offAllNamed("/login"); // Login ekranına yönlendir
+  }
 
-    await GraphQLService.refreshClient(); // Token’sız client oluştur
+  Future<void> autoLogoutIfGuest() async {
+    final client = GraphQLService.client.value;
 
-    Get.offAllNamed("/login"); // Giriş ekranına yönlendir
+    const String query = """
+      query GetMyRole(\$id: ID!) {
+        employee(id: \$id) {
+          id
+          role
+        }
+      }
+    """;
+
+    final result = await client.query(
+      QueryOptions(
+        document: gql(query),
+        variables: {"id": id.value},
+        fetchPolicy: FetchPolicy.noCache,
+      ),
+    );
+
+    if (!result.hasException) {
+      final currentRole = result.data?["employee"]?["role"];
+      if (currentRole == "misafir") {
+        Get.snackbar("Oturum Sonlandırıldı", "Yetkiniz kaldırıldı.");
+        await logoutUser();
+      }
+    } else {
+      print("❌ Rol kontrolü başarısız: ${result.exception.toString()}");
+    }
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/services/add_service_controller.dart';
 import 'package:mobil/core/services/service_controller.dart';
+import 'package:mobil/utils/constants/colors.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 import 'package:mobil/utils/loaders/loader_service.dart';
 
@@ -13,16 +15,19 @@ class ManageServicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          "Hizmetler",
+          "SALON SAÇ",
           style: TextStyle(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Domine',
+            letterSpacing: 1.2,
+            fontFamily: 'Teko',
+            color: Colors.black87,
           ),
         ),
       ),
@@ -85,18 +90,12 @@ class ManageServicesScreen extends StatelessWidget {
                             itemCount: serviceController.services.length,
                             itemBuilder: (context, index) {
                               final service = serviceController.services[index];
-                              return Card(
-                                  color: Colors.blue[50],
-                                  elevation: 2,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        ProjectSizes.s / 1.5),
-                                  ),
-                                  child: ListTile(
-                                    title: Text(service['title']),
-                                    subtitle: Text(
-                                        "Süre: ${service['duration']} dk\n₺${service['price']}"),
-                                  ));
+                              return ListTile(
+                                leading: Icon(Iconsax.card_tick4),
+                                title: Text(service['title']),
+                                subtitle: Text(
+                                    "Süre: ${service['duration']} dk\n₺${service['price']}"),
+                              );
                             },
                           ),
               ),
