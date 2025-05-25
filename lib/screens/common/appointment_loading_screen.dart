@@ -11,7 +11,6 @@ class AppointmentLoadingScreen extends StatelessWidget {
   Future<void> loadDataAndRedirect() async {
     final session = Get.find<UserSessionController>();
 
-    // 👤 Geçici olarak kullanıcı rolünü patron olarak ayarlayalım (eğer dışarıdan gelmiyorsa)
     if (session.role.value.isEmpty) {
       session.setUser(
         userId: "temporary",
@@ -26,8 +25,6 @@ class AppointmentLoadingScreen extends StatelessWidget {
         Get.put(EmployeesController()).fetchEmployees(),
         Get.put(AppointmentController()).fetchAppointments(),
       ] as Iterable<Future>);
-
-      Get.offAllNamed('/main');
     } catch (e) {
       print("❌ Yükleme hatası: $e");
     }

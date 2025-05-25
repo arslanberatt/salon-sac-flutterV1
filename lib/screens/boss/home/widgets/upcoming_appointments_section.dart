@@ -16,7 +16,7 @@ class UpcomingAppointmentsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Yaklaşan Randevular",
+          "Bugünün Randevuları",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: ProjectSizes.containerPaddingS),

@@ -7,17 +7,20 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          "Gizlilik ve Kullanım Koşulları",
+          "Gizlilik ve Kullanım Koşullar",
           style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Domine',
-              fontSize: ProjectSizes.lg),
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            fontFamily: 'Teko',
+            color: Colors.black87,
+          ),
         ),
       ),
       body: const Padding(

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:mobil/core/appointments/add_appointment_controller.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/core/core/user_session_controller.dart';
-import 'package:mobil/screens/common/appointment_loading_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
+import 'package:mobil/utils/loaders/loader_appointment.dart';
 import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class AddAppointmentScreen extends StatelessWidget {
@@ -19,22 +18,25 @@ class AddAppointmentScreen extends StatelessWidget {
     final session = Get.find<UserSessionController>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          "Randevu Ekle",
+          "SALON SAÇ",
           style: TextStyle(
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Domine',
+            letterSpacing: 1.2,
+            fontFamily: 'Teko',
+            color: Colors.black87,
           ),
         ),
       ),
       body: Obx(() {
         if (controller.loading.value) {
-          return const Center(child: AppointmentLoadingScreen());
+          return const Center(child: LoaderAppointment());
         }
 
         return Padding(
@@ -68,41 +70,14 @@ class AddAppointmentScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                /// 👤 Çalışan Seçimi
-                if (controller.allowGlobalAppointments.value ||
-                    session.isPatron)
-                  DropdownButtonFormField2(
-                    decoration: const InputDecoration(
-                      labelText: "Çalışan Seçin",
-                      border: OutlineInputBorder(),
-                    ),
-                    value: session.isPatron
-                        ? (controller.selectedEmployeeId.value.isEmpty
-                            ? null
-                            : controller.selectedEmployeeId.value)
-                        : session.id.value,
-                    items: controller.employees
-                        .where((e) => session.isPatron
-                            ? true
-                            : e['id'] == session.id.value)
-                        .map((e) => DropdownMenuItem(
-                              value: e['id'],
-                              child: Text(e['name']),
-                            ))
-                        .toList(),
-                    onChanged: session.isPatron
-                        ? (val) =>
-                            controller.selectedEmployeeId.value = val as String
-                        : null,
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      "Çalışan: ${session.name.value}",
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
+                /// 👤 Çalışan Bilgisi
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    "Çalışan: ${session.name.value}",
+                    style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
+                ),
 
                 const SizedBox(height: 16),
 
@@ -149,7 +124,7 @@ class AddAppointmentScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                /// 📅 Tarih ve Saat (daha güzel format)
+                /// 📅 Tarih ve Saat
                 ListTile(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -182,6 +157,12 @@ class AddAppointmentScreen extends StatelessWidget {
                           pickedTime.hour,
                           pickedTime.minute,
                         );
+                      } else {
+                        controller.selectedDateTime.value = null;
+                        CustomSnackBar.errorSnackBar(
+                          title: "Saat Seçilmedi",
+                          message: "Lütfen saat seçimini tamamlayın.",
+                        );
                       }
                     }
                   },
@@ -213,21 +194,30 @@ class AddAppointmentScreen extends StatelessWidget {
                                   CustomSnackBar.successSnackBar(
                                       title: "Başarılı",
                                       message: "Randevu oluşturuldu!");
-                                  Get.back(); // Başarıyla oluşturulduğunda geri git
+                                  Get.back();
+                                } else {
+                                  CustomSnackBar.errorSnackBar(
+                                      title: "Eksik Alan",
+                                      message: controller
+                                              .selectedCustomerId.value.isEmpty
+                                          ? "Lütfen müşteri seçin."
+                                          : "En az bir hizmet seçin.");
                                 }
                               },
                         child: controller.loading.value
                             ? const CircularProgressIndicator(
                                 color: Colors.white)
-                            : Text("Randevu Oluştur",
+                            : Text(
+                                "Randevu Oluştur",
                                 style: Theme.of(context)
                                     .textTheme
                                     .headlineSmall
                                     ?.copyWith(
-                                        color: Colors.white,
-                                        fontSize:
-                                            ProjectSizes.containerPaddingM /
-                                                1.5)),
+                                      color: Colors.white,
+                                      fontSize:
+                                          ProjectSizes.containerPaddingM / 1.5,
+                                    ),
+                              ),
                       )),
                 ),
               ],

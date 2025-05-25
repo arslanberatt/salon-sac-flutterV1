@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobil/utils/constants/colors.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 import '../../core/employees/employee_detail_controller.dart';
 
 class EmployeeDetailScreen extends StatelessWidget {
@@ -12,30 +14,29 @@ class EmployeeDetailScreen extends StatelessWidget {
     final controller = Get.put(EmployeeDetailController(employee: employee));
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
-        elevation: 0,
         backgroundColor: Colors.white,
+        elevation: 0,
         title: Obx(() => Text(
               controller.name.value,
-              style: const TextStyle(color: Colors.black),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+                fontFamily: 'Teko',
+                color: Colors.black87,
+              ),
             )),
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(24.0),
         children: [
-          const Text(
-            "Çalışan Bilgileri",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 16),
+          Text("Çalışan Bilgileri",
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: ProjectSizes.spaceBtwItems),
 
           // Maaş
           TextFormField(
@@ -82,7 +83,7 @@ class EmployeeDetailScreen extends StatelessWidget {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue.shade600,
+                      backgroundColor: ProjectColors.main2Color,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

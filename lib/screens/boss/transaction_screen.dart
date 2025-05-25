@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobil/screens/boss/home/widgets/boss_app_bar.dart';
-import 'package:mobil/screens/boss/transaction_widgets/transaction_action_buttons.dart';
 import 'package:mobil/screens/boss/transaction_widgets/transaction_list.dart';
 import 'package:mobil/screens/boss/transaction_widgets/transaction_summary_card.dart';
 import '../../core/transactions/transaction_controller.dart';
@@ -17,18 +15,26 @@ class TransactionScreen extends StatelessWidget {
 
     return Obx(() {
       final items = controller.transactions.toList();
-
       final totalIncome = controller.totalIncome;
       final totalExpense = controller.totalExpense;
       final balance = totalIncome - totalExpense;
 
-      print(balance);
-
       return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: BossAppBar(),
+        backgroundColor: const Color.fromARGB(249, 255, 255, 255),
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: const Text(
+            "SALON SAÇ",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              fontFamily: 'Teko',
+              color: Colors.black87,
+            ),
+          ),
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -54,12 +60,32 @@ class TransactionScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               /// Aksiyon Butonları
-              TransactionActionButtons(
-                mainColor: mainColor,
-                onWithdraw: () =>
-                    showTransactionDialog(context, 'gider', controller),
-                onContribute: () =>
-                    showTransactionDialog(context, 'gelir', controller),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => showTransactionDialog(
+                      context,
+                      'gelir',
+                      controller,
+                      label: 'Gelir Ekle',
+                    ),
+                    icon: const Icon(Icons.add_circle),
+                    label: const Text("Gelir Ekle"),
+                    style: ElevatedButton.styleFrom(backgroundColor: mainColor),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => showTransactionDialog(
+                      context,
+                      'gider',
+                      controller,
+                      label: 'Ödeme Yap',
+                    ),
+                    icon: const Icon(Icons.remove_circle),
+                    label: const Text("Ödeme Yap"),
+                    style: ElevatedButton.styleFrom(backgroundColor: mainColor),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 24),
@@ -82,5 +108,54 @@ class TransactionScreen extends StatelessWidget {
         ),
       );
     });
+  }
+
+  void showTransactionDialog(
+      BuildContext context, String type, TransactionController controller,
+      {required String label}) {
+    final TextEditingController amountController = TextEditingController();
+    final TextEditingController descController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(label),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Tutar'),
+            ),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: 'Açıklama'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("İptal"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final amount = double.tryParse(amountController.text) ?? 0;
+              final desc = descController.text.trim();
+              if (amount > 0 && desc.isNotEmpty) {
+                controller.addTransaction(
+                  type: type,
+                  amount: amount,
+                  description: desc,
+                );
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Kaydet"),
+          ),
+        ],
+      ),
+    );
   }
 }

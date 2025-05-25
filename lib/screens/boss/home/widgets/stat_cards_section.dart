@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/core/transactions/transaction_controller.dart';
+import 'package:mobil/screens/appointments/appointment_screen.dart';
 import 'package:mobil/screens/boss/manage_service_screen.dart';
 import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:mobil/screens/customers/add_customer_screen.dart';
@@ -45,6 +46,8 @@ class StatCardsSection extends StatelessWidget {
             const SizedBox(width: ProjectSizes.s),
             Expanded(
               child: Obx(() => StatCard(
+                    onTap: () => GetPage(
+                        name: '/appointments', page: () => AppointmentScreen()),
                     title: "Aktif Randevu",
                     value:
                         "${appointmentController.waitingAppointments.value} adet",

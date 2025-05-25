@@ -1,15 +1,23 @@
-// ✅ AuthController - Giriş işlemi ve session kaydı
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 import '../core/user_session_controller.dart';
 
 class AuthController extends GetxController {
   final storage = const FlutterSecureStorage();
 
+  // Giriş için
   var email = ''.obs;
   var password = ''.obs;
+
+  // Kayıt için
+  var firstName = ''.obs;
+  var lastName = ''.obs;
+  var phone = ''.obs;
+  var confirmPassword = ''.obs;
+
   var loading = false.obs;
 
   final String loginMutation = """
@@ -25,9 +33,36 @@ class AuthController extends GetxController {
     }
   """;
 
-  void login() async {
+  final String registerMutation = """
+    mutation RegisterEmployee(
+      \$name: String!
+      \$phone: String!
+      \$email: String!
+      \$password: String!
+      \$role: String!
+    ) {
+      registerEmployee(
+        name: \$name
+        phone: \$phone
+        email: \$email
+        password: \$password
+        role: \$role
+      ) {
+        id
+        name
+        email
+        role
+      }
+    }
+  """;
+
+  /// 🔐 Giriş İşlemi
+  Future<void> login() async {
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar("Hata", "Email ve şifre boş olamaz");
+      CustomSnackBar.errorSnackBar(
+        title: "Eksik Bilgi",
+        message: "Email ve şifre boş olamaz.",
+      );
       return;
     }
 
@@ -45,48 +80,104 @@ class AuthController extends GetxController {
       ));
 
       if (result.hasException) {
-        final graphqlErrors = result.exception!.graphqlErrors;
-        final linkException = result.exception!.linkException;
-
-        if (graphqlErrors.isNotEmpty) {
-          Get.snackbar("Giriş Başarısız", graphqlErrors.first.message);
-        } else if (linkException != null) {
-          Get.snackbar("Ağ Hatası", linkException.toString());
-        } else {
-          Get.snackbar("Hata", "Bilinmeyen bir hata oluştu.");
-        }
-
-        print("⚠️ GraphQL Exception: ${result.exception.toString()}");
+        final error = result.exception!.graphqlErrors.firstOrNull?.message ??
+            "Giriş sırasında hata oluştu.";
+        CustomSnackBar.errorSnackBar(title: "Giriş Başarısız", message: error);
         return;
       }
 
       final token = result.data!["loginEmployee"]["token"];
       final employee = result.data!["loginEmployee"]["employee"];
 
-      await storage.write(key: "token", value: token);
-      await GraphQLService.refreshClient();
-
-      final session = Get.find<UserSessionController>();
-      session.name.value = employee["name"];
-      session.setUser(
-        userId: employee["id"],
-        userRole: employee["role"],
-      );
-
-      // 🔥 MISAFIR ROL KONTROLÜ
+      // Misafir ise girişe izin verme
       if (employee["role"] == "misafir") {
-        Get.snackbar("Yetkisiz", "Hesabınız henüz onaylanmamış.");
-        await storage.delete(key: "token");
-        Get.offAllNamed('/login');
+        CustomSnackBar.errorSnackBar(
+          title: "Yetkisiz Giriş",
+          message: "Hesabınız henüz onaylanmadı. Lütfen yöneticinize başvurun.",
+        );
         return;
       }
 
-      // ROL BAZLI YÖNLENDİRME
-      if (session.isPatron || session.isEmployee) {
-        Get.offAllNamed('/main');
-      }
+      // Token kaydet
+      await storage.write(key: "token", value: token);
+      await GraphQLService.refreshClient();
+
+      // Session'a kullanıcıyı ata
+      final session = Get.find<UserSessionController>();
+      session.setUser(
+        userId: employee["id"],
+        userRole: employee["role"],
+        userName: employee["name"],
+      );
+
+      // Rol bazlı yönlendirme
+      Get.offAllNamed('/main');
     } catch (e) {
-      Get.snackbar("Hata", "Bir şeyler ters gitti. $e");
+      CustomSnackBar.errorSnackBar(
+        title: "Hata",
+        message: "Bir şeyler ters gitti. Tekrar deneyin.",
+      );
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  /// 📝 Kayıt İşlemi
+  Future<void> register() async {
+    if (firstName.isEmpty ||
+        lastName.isEmpty ||
+        phone.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      CustomSnackBar.errorSnackBar(
+        title: "Eksik Bilgi",
+        message: "Tüm alanları doldurun.",
+      );
+      return;
+    }
+
+    if (password.value != confirmPassword.value) {
+      CustomSnackBar.errorSnackBar(
+        title: "Parola Hatası",
+        message: "Parolalar uyuşmuyor.",
+      );
+      return;
+    }
+
+    loading.value = true;
+
+    try {
+      final client = GraphQLService.client.value;
+      final result = await client.mutate(MutationOptions(
+        document: gql(registerMutation),
+        variables: {
+          "name": "${firstName.value} ${lastName.value}",
+          "phone": phone.value,
+          "email": email.value,
+          "password": password.value,
+          "role": "misafir", // Yeni kayıtlar misafir olarak gelir
+        },
+        fetchPolicy: FetchPolicy.noCache,
+        onCompleted: (data) => Get.back(result: true),
+      ));
+
+      if (result.hasException) {
+        final error = result.exception!.graphqlErrors.firstOrNull?.message ??
+            "Kayıt sırasında hata oluştu.";
+        CustomSnackBar.errorSnackBar(title: "Kayıt Başarısız", message: error);
+        return;
+      }
+
+      CustomSnackBar.successSnackBar(
+        title: "Kayıt Başarılı",
+        message: "Hesabınız oluşturuldu. Giriş yapabilirsiniz.",
+      );
+    } catch (e) {
+      CustomSnackBar.errorSnackBar(
+        title: "Hata",
+        message: "Bir şeyler ters gitti. Tekrar deneyin.",
+      );
     } finally {
       loading.value = false;
     }

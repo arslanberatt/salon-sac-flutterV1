@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/routes/app_pages.dart';
 import 'package:mobil/utils/services/graphql_service.dart';
 
 class UserSessionController extends GetxController {
@@ -36,37 +37,37 @@ class UserSessionController extends GetxController {
     const storage = FlutterSecureStorage();
     await storage.delete(key: "token"); // Token’ı sil
     await GraphQLService.refreshClient(); // Yeni (anonim) client
-    Get.offAllNamed("/login"); // Login ekranına yönlendir
+    Get.offAllNamed(AppRoutes.login); // Login ekranına yönlendir
   }
 
   Future<void> autoLogoutIfGuest() async {
-    final client = GraphQLService.client.value;
+    //   final client = GraphQLService.client.value;
 
-    const String query = """
-      query GetMyRole(\$id: ID!) {
-        employee(id: \$id) {
-          id
-          role
-        }
-      }
-    """;
+    //   const String query = """
+    //     query GetMyRole(\$id: ID!) {
+    //       employee(id: \$id) {
+    //         id
+    //         role
+    //       }
+    //     }
+    //   """;
 
-    final result = await client.query(
-      QueryOptions(
-        document: gql(query),
-        variables: {"id": id.value},
-        fetchPolicy: FetchPolicy.noCache,
-      ),
-    );
+    //   final result = await client.query(
+    //     QueryOptions(
+    //       document: gql(query),
+    //       variables: {"id": id.value},
+    //       fetchPolicy: FetchPolicy.noCache,
+    //     ),
+    //   );
 
-    if (!result.hasException) {
-      final currentRole = result.data?["employee"]?["role"];
-      if (currentRole == "misafir") {
-        Get.snackbar("Oturum Sonlandırıldı", "Yetkiniz kaldırıldı.");
-        await logoutUser();
-      }
-    } else {
-      print("❌ Rol kontrolü başarısız: ${result.exception.toString()}");
-    }
+    //   if (!result.hasException) {
+    //     final currentRole = result.data?["employee"]?["role"];
+    //     if (currentRole == "misafir") {
+    //       Get.snackbar("Oturum Sonlandırıldı", "Yetkiniz kaldırıldı.");
+    //       await logoutUser();
+    //     }
+    //   } else {
+    //     print("❌ Rol kontrolü başarısız: ${result.exception.toString()}");
+    //   }
   }
 }

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/core/user_info_controller.dart';
+import 'package:mobil/screens/boss/home/widgets/boss_app_bar.dart';
 import 'package:mobil/screens/common/password_change_screen.dart';
 import 'package:mobil/screens/common/privacy_policy_screen.dart';
 import 'package:mobil/screens/common/profile_edit_screen.dart';
+import 'package:mobil/utils/constants/colors.dart';
 import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -21,16 +23,10 @@ class SettingsScreen extends StatelessWidget {
     controller.fetchUserInfo();
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        title: const Text(
-          "Ayarlar",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Domine',
-          ),
-        ),
+      backgroundColor: ProjectColors.backColor,
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: BossAppBar(),
       ),
       body: Obx(() {
         if (controller.loading.value) {
@@ -102,8 +98,7 @@ class SettingsScreen extends StatelessWidget {
             _buildItem(Icons.support_agent, "İletişim", () {
               CustomSnackBar.warningSnackBar(
                 title: "İletişim",
-                message: "İletişim için:"
-                    "Email: arslanberattdev@gmail.com",
+                message: "İletişim için: arslanberattdev@gmail.com",
               );
             }),
             _buildDivider(),

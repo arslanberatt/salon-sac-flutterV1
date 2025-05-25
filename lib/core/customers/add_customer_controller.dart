@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -51,7 +49,6 @@ class AddCustomerController extends GetxController {
           },
           fetchPolicy: FetchPolicy.noCache,
           onCompleted: (data) {
-            // ✅ INPUT ALANLARINI TEMİZLE
             nameController.clear();
             phoneController.clear();
             notesController.clear();

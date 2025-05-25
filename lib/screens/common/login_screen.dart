@@ -1,6 +1,7 @@
 import 'package:mobil/core/auth/auth_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobil/screens/common/register_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -36,9 +37,9 @@ class LoginScreen extends StatelessWidget {
                     const Text(
                       "SALON SAÇ",
                       style: TextStyle(
-                        fontSize: ProjectSizes.containerPaddingL,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Domine',
+                        fontSize: ProjectSizes.containerPaddingXL,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Teko',
                       ),
                     ),
                   ],
@@ -84,7 +85,7 @@ class LoginScreen extends StatelessWidget {
                   const Text("Hesabınız yok mu?"),
                   TextButton(
                     onPressed: () {
-                      // TODO: Login sayfasına git
+                      Get.to(() => RegisterScreen());
                     },
                     child: const Text("Kayıt Ol",
                         style: TextStyle(

@@ -24,9 +24,6 @@ class AddAppointmentController extends GetxController {
   final notes = ''.obs;
   final loading = false.obs;
 
-  /// --- Ayar ---
-  final allowGlobalAppointments = true.obs;
-
   /// --- GraphQL Mutasyonu ---
   final String addAppointmentMutation = """
     mutation AddAppointment(
@@ -69,38 +66,19 @@ class AddAppointmentController extends GetxController {
         client.query(
             QueryOptions(document: gql("""query { customers { id name } }"""))),
         client.query(QueryOptions(
-            document: gql("""query { employees { id name role } }"""))),
-        client.query(QueryOptions(
             document:
                 gql("""query { services { id title duration price } }"""))),
       ]);
 
       customers.value =
           List<Map<String, dynamic>>.from(results[0].data?['customers'] ?? []);
-      employees.value =
-          List<Map<String, dynamic>>.from(results[1].data?['employees'] ?? []);
       services.value =
-          List<Map<String, dynamic>>.from(results[2].data?['services'] ?? []);
+          List<Map<String, dynamic>>.from(results[1].data?['services'] ?? []);
     } catch (e) {
       print("❌ Veri çekme hatası: $e");
     } finally {
       loading.value = false;
     }
-  }
-
-  /// --- Yetki kontrolü ---
-  bool canBookForOthers(String userId) {
-    if (allowGlobalAppointments.value) return true;
-    if (selectedEmployeeId.value == userId) return true;
-
-    final user = employees.firstWhereOrNull((e) => e['id'] == userId);
-    if (user != null && user['role'] == 'patron') return true;
-
-    CustomSnackBar.errorSnackBar(
-      title: "Yetki Yok",
-      message: "Sadece kendiniz için randevu oluşturabilirsiniz.",
-    );
-    return false;
   }
 
   /// --- Çakışma ve günlük randevu kontrolü ---
@@ -155,19 +133,13 @@ class AddAppointmentController extends GetxController {
 
   /// --- Randevu oluştur ---
   Future<bool> submitAppointment() async {
-    final session = Get.find<UserSessionController>();
-
     if (selectedCustomerId.isEmpty ||
-        selectedEmployeeId.isEmpty ||
         selectedServiceIds.isEmpty ||
         selectedDateTime.value == null) {
       CustomSnackBar.errorSnackBar(
           title: "Eksik Bilgi", message: "Tüm alanları doldurun.");
       return false;
     }
-
-    if (!canBookForOthers(session.id.value)) return false;
-    if (await hasConflictOrDuplicate()) return false;
 
     loading.value = true;
     final client = GraphQLService.client.value;
@@ -183,22 +155,45 @@ class AddAppointmentController extends GetxController {
           'totalPrice': totalPrice,
           'notes': notes.value.isEmpty ? null : notes.value,
         },
-        onCompleted: (data) => Get.back(result: true),
       ));
 
       if (result.hasException) {
-        print("❌ Hata: ${result.exception}");
-        CustomSnackBar.errorSnackBar(
-            title: "Hata", message: "Randevu oluşturulamadı.");
+        final errorMsg = result.exception?.graphqlErrors.firstOrNull?.message ??
+            "Randevu oluşturulamadı.";
+
+        if (errorMsg.contains("başka bir randevusu var")) {
+          CustomSnackBar.errorSnackBar(
+            title: "Çakışan Randevu",
+            message:
+                "Bu çalışanın seçilen saat aralığında başka bir randevusu var.",
+          );
+        } else if (errorMsg.contains("zaten bir randevu alınmış")) {
+          CustomSnackBar.errorSnackBar(
+            title: "Tekrarlayan Randevu",
+            message:
+                "Bu müşteriye o gün zaten bir randevu alınmış. İkinci kez ekleyemezsiniz.",
+          );
+        } else {
+          CustomSnackBar.errorSnackBar(
+            title: "Sunucu Hatası",
+            message: errorMsg,
+          );
+        }
+
         return false;
       }
 
       CustomSnackBar.successSnackBar(
           title: "Başarılı", message: "Randevu oluşturuldu.");
       Get.find<AppointmentController>().fetchAppointments(); // otomatik yenile
+      Get.back();
       return true;
     } catch (e) {
       print("❌ Submit error: $e");
+      CustomSnackBar.errorSnackBar(
+        title: "Hata",
+        message: "Randevu gönderimi sırasında bir hata oluştu.",
+      );
       return false;
     } finally {
       loading.value = false;
@@ -210,9 +205,7 @@ class AddAppointmentController extends GetxController {
     super.onInit();
     fetchAllData();
     final session = Get.find<UserSessionController>();
-    if (!allowGlobalAppointments.value) {
-      selectedEmployeeId.value = session.id.value;
-    }
+    selectedEmployeeId.value = session.id.value; // 🔒 Sabit çalışan ID
   }
 
   @override

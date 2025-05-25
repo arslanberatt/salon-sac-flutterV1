@@ -15,16 +15,19 @@ class AdvanceApprovalScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color.fromARGB(249, 255, 255, 255),
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.white,
           elevation: 0,
           title: const Text(
-            "Avans Talepleri",
+            "SALON SAÇ",
             style: TextStyle(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Domine',
+              letterSpacing: 1.2,
+              fontFamily: 'Teko',
+              color: Colors.black87,
             ),
           ),
           bottom: PreferredSize(

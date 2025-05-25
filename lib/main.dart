@@ -11,9 +11,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initHiveForFlutter();
   await GraphQLService.refreshClient();
-
-  Get.put(UserSessionController(), permanent: true);
-
+  Get.put(UserSessionController());
   runApp(const MyApp());
 }
 

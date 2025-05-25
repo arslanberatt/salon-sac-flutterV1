@@ -17,7 +17,22 @@ class PasswordChangeScreen extends StatelessWidget {
     final confirmController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Şifreyi Değiştir")),
+      backgroundColor: Color.fromARGB(249, 255, 255, 255),
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          "SALON SAÇ",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            fontFamily: 'Teko',
+            color: Colors.black87,
+          ),
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

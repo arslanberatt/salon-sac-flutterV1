@@ -13,7 +13,7 @@ class MyThemes {
         primary: Colors.black,
       ),
       useMaterial3: true,
-      scaffoldBackgroundColor: ProjectColors.back1Color,
+      scaffoldBackgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBarTheme: CustomAppbarThemes.appBarTheme,
       elevatedButtonTheme: CustomElevatedButtonTheme.elevatedButtonTheme,
       inputDecorationTheme: CustomTextFieldTheme.lightTextFieldTheme,

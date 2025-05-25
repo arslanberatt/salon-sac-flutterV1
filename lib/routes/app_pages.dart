@@ -1,13 +1,12 @@
 import 'package:mobil/screens/appointments/add_appointment_screen.dart';
-import 'package:mobil/screens/boss/manage_service_screen.dart';
 import 'package:mobil/screens/boss/advance_approval_screen.dart';
-import 'package:mobil/screens/boss/transaction_screen.dart';
-import 'package:mobil/screens/common/privacy_policy_screen.dart';
+import 'package:mobil/screens/boss/manage_service_screen.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
 import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/profile_screen.dart';
 import 'package:mobil/screens/employee/salary_record_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
+import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:get/get.dart';
 import '../screens/common/splash_screen.dart';
 import '../screens/common/login_screen.dart';
@@ -29,8 +28,6 @@ class AppRoutes {
   static const String salaryRecord = '/salary_record';
   static const String profile = '/profile';
   static const String settings = '/settings';
-  static const String performance = '/performance';
-  static const String privacyPolicy = '/privacy-policy';
 
   static final List<GetPage> routes = [
     GetPage(name: splash, page: () => SplashScreen()),
@@ -46,6 +43,6 @@ class AppRoutes {
     GetPage(name: salaryRecord, page: () => const SalaryRecordScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: settings, page: () => const SettingsScreen()),
-    GetPage(name: privacyPolicy, page: () => const PrivacyPolicyScreen()),
+    GetPage(name: listService, page: () => ManageServicesScreen()),
   ];
 }

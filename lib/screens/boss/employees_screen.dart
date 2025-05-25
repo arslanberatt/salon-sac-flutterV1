@@ -15,64 +15,65 @@ class EmployeesScreen extends StatelessWidget {
     final advanceApprovalController = Get.put(AdvanceApprovalController());
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.grey[100],
-          elevation: 0,
-          title: const Text(
-            "Çalışanlar",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Domine',
-            ),
+      backgroundColor: Color.fromARGB(249, 255, 255, 255),
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          "SALON SAÇ",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            fontFamily: 'Teko',
+            color: Colors.black87,
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Stack(
-                children: [
-                  IconButton(
-                    icon: const Icon(Iconsax.notification, size: 28),
-                    onPressed: () {
-                      Get.to(() => const AdvanceApprovalScreen());
-                    },
-                  ),
-                  Obx(() {
-                    final count =
-                        advanceApprovalController.advanceWaitList.length;
-                    if (count == 0) return const SizedBox();
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Iconsax.notification, size: 28),
+                  onPressed: () {
+                    Get.to(() => const AdvanceApprovalScreen());
+                  },
+                ),
+                Obx(() {
+                  final count =
+                      advanceApprovalController.advanceWaitList.length;
+                  if (count == 0) return const SizedBox();
 
-                    return Positioned(
-                      right: 6,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints:
-                            const BoxConstraints(minWidth: 20, minHeight: 20),
-                        child: Center(
-                          child: Text(
-                            count > 99 ? "99+" : count.toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  return Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints:
+                          const BoxConstraints(minWidth: 20, minHeight: 20),
+                      child: Center(
+                        child: Text(
+                          count > 99 ? "99+" : count.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    );
-                  }),
-                ],
-              ),
+                    ),
+                  );
+                }),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       body: Obx(() {
         if (employeeController.loading.value) {
@@ -85,9 +86,6 @@ class EmployeesScreen extends StatelessWidget {
             .toList();
         final workers = allEmployees
             .where((e) => e["role"]?.toUpperCase() == "CALISAN")
-            .toList();
-        final guests = allEmployees
-            .where((e) => e["role"]?.toUpperCase() == "MISAFIR")
             .toList();
 
         if (allEmployees.isEmpty) {
@@ -121,24 +119,6 @@ class EmployeesScreen extends StatelessWidget {
               if (workers.isNotEmpty) ...[
                 const SectionTitle(title: "Çalışanlar"),
                 ...workers.map((emp) => ZenithProjectCard(
-                      employee: emp,
-                      onTap: () async {
-                        final result = await Get.to(
-                            () => EmployeeDetailScreen(employee: emp));
-                        if (result is Map<String, dynamic>) {
-                          final index = employeeController.employees
-                              .indexWhere((e) => e["id"] == result["id"]);
-                          if (index != -1) {
-                            employeeController.employees[index] = result;
-                            employeeController.employees.refresh();
-                          }
-                        }
-                      },
-                    )),
-              ],
-              if (guests.isNotEmpty) ...[
-                const SectionTitle(title: "Misafirler"),
-                ...guests.map((emp) => ZenithProjectCard(
                       employee: emp,
                       onTap: () async {
                         final result = await Get.to(
@@ -192,6 +172,10 @@ class ZenithProjectCard extends StatelessWidget {
     final double salary = (employee["salary"] ?? 0).toDouble();
     final double commissionRate = (employee["commissionRate"] ?? 0).toDouble();
     final double advanceBalance = (employee["advanceBalance"] ?? 0).toDouble();
+    final double monthlyBonus = (employee["monthlyBonus"] ?? 0).toDouble();
+    final double monthlyAdvance = (employee["monthlyAdvance"] ?? 0).toDouble();
+    final double netThisMonth = (employee["netThisMonth"] ?? 0).toDouble();
+
     final String role = employee["role"]?.toUpperCase() ?? "ÇALIŞAN";
 
     Color badgeColor = Colors.grey;
@@ -212,6 +196,7 @@ class ZenithProjectCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Başlık + Rol + Komisyon yüzdesi
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -254,8 +239,8 @@ class ZenithProjectCard extends StatelessWidget {
                     alignment: Alignment.center,
                     children: [
                       SizedBox(
-                        width: 40,
-                        height: 40,
+                        width: 45,
+                        height: 45,
                         child: CircularProgressIndicator(
                           value: commissionRate / 100,
                           strokeWidth: 4,
@@ -272,14 +257,32 @@ class ZenithProjectCard extends StatelessWidget {
                   ),
                 ],
               ),
+
+              // Telefon Bilgisi
               _buildInfoColumn("Telefon", phone),
+
               const SizedBox(height: 16),
+
+              // Maaş + Avans Bakiyesi
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildInfoColumn("Maaş", "₺${salary.toStringAsFixed(0)}"),
+                ],
+              ),
+
+              const SizedBox(height: 12),
+
+              // Bu Ay: Prim, Avans, Net
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
                   _buildInfoColumn(
-                      "Avans", "₺${advanceBalance.toStringAsFixed(0)}"),
+                      "Bu Ay Prim", "₺${monthlyBonus.toStringAsFixed(0)}"),
+                  _buildInfoColumn(
+                      "Bu Ay Avans", "-₺${monthlyAdvance.toStringAsFixed(0)}"),
+                  _buildInfoColumn(
+                      "Net Bu Ay", "₺${netThisMonth.toStringAsFixed(0)}"),
                 ],
               ),
             ],
