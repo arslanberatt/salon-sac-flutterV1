@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 
 class EmployeeDetailController extends GetxController {
@@ -85,7 +86,8 @@ class EmployeeDetailController extends GetxController {
 
     if (result.hasException) {
       print("❌ Çalışan bilgisi alınamadı: ${result.exception}");
-      Get.snackbar("Hata", "Çalışan bilgisi alınamadı.");
+      CustomSnackBar.errorSnackBar(
+          title: "Hata", message: "Çalışan bilgisi alınamadı.");
       return;
     }
 
@@ -102,7 +104,8 @@ class EmployeeDetailController extends GetxController {
 
   Future<void> updateEmployee() async {
     if (passwordController.text.trim().isEmpty) {
-      Get.snackbar("Hata", "Lütfen onay şifresi girin");
+      CustomSnackBar.errorSnackBar(
+          title: "Hata", message: "Lütfen onay şifresi girin");
       return;
     }
 
@@ -141,10 +144,12 @@ class EmployeeDetailController extends GetxController {
         throw roleResult.exception!;
       }
 
-      Get.snackbar("Başarılı", "Çalışan başarıyla güncellendi");
+      CustomSnackBar.successSnackBar(
+          title: "Başarılı", message: "Çalışan başarıyla güncellendi");
       Get.back(result: true);
     } catch (e) {
-      Get.snackbar("Hata", "Güncelleme başarısız: $e");
+      CustomSnackBar.errorSnackBar(
+          title: "Hata", message: "Güncelleme başarısız: $e");
       print("❌ Güncelleme hatası: $e");
     } finally {
       isSaving.value = false;

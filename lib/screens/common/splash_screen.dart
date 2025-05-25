@@ -4,6 +4,7 @@ import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class SplashScreen extends StatelessWidget {
   final storage = const FlutterSecureStorage();
@@ -44,7 +45,8 @@ class SplashScreen extends StatelessWidget {
       if (role == "patron" || role == "calisan") {
         Get.offAllNamed('/main');
       } else {
-        Get.snackbar("Onay Bekleniyor", "Hesabınız henüz onaylanmamış.");
+        CustomSnackBar.warningSnackBar(
+            title: "Onay Bekleniyor", message: "Hesabınız henüz onaylanmamış.");
         Get.offAllNamed('/login');
       }
     } catch (e) {

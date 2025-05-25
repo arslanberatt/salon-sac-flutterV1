@@ -14,7 +14,7 @@ class CustomSnackBar {
     Get.snackbar(
       title,
       message,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       backgroundColor: Colors.red,
       colorText: Colors.white,
       duration: duration,
@@ -58,7 +58,7 @@ class CustomSnackBar {
       shouldIconPulse: true,
       colorText: ProjectColors.whiteColor,
       backgroundColor: ProjectColors.greenColor, // Başarı için yeşil renk
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       duration: Duration(seconds: duration),
       margin: const EdgeInsets.all(10),
       icon: const Icon(Icons.check_circle, color: Colors.white),
@@ -77,7 +77,7 @@ class CustomSnackBar {
       shouldIconPulse: true,
       colorText: ProjectColors.whiteColor,
       backgroundColor: ProjectColors.orangeColor, // Uyarı için turuncu renk
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       duration: Duration(seconds: duration),
       margin: const EdgeInsets.all(20),
       icon: const Icon(Icons.warning, color: Colors.white),

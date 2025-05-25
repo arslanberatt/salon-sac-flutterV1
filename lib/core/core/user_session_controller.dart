@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:mobil/routes/app_pages.dart';
 import 'package:mobil/utils/services/graphql_service.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class UserSessionController extends GetxController {
   final id = ''.obs;
@@ -41,33 +42,34 @@ class UserSessionController extends GetxController {
   }
 
   Future<void> autoLogoutIfGuest() async {
-    //   final client = GraphQLService.client.value;
+    final client = GraphQLService.client.value;
 
-    //   const String query = """
-    //     query GetMyRole(\$id: ID!) {
-    //       employee(id: \$id) {
-    //         id
-    //         role
-    //       }
-    //     }
-    //   """;
+    const String query = """
+        query GetMyRole(\$id: ID!) {
+          employee(id: \$id) {
+            id
+            role
+          }
+        }
+      """;
 
-    //   final result = await client.query(
-    //     QueryOptions(
-    //       document: gql(query),
-    //       variables: {"id": id.value},
-    //       fetchPolicy: FetchPolicy.noCache,
-    //     ),
-    //   );
+    final result = await client.query(
+      QueryOptions(
+        document: gql(query),
+        variables: {"id": id.value},
+        fetchPolicy: FetchPolicy.noCache,
+      ),
+    );
 
-    //   if (!result.hasException) {
-    //     final currentRole = result.data?["employee"]?["role"];
-    //     if (currentRole == "misafir") {
-    //       Get.snackbar("Oturum Sonlandırıldı", "Yetkiniz kaldırıldı.");
-    //       await logoutUser();
-    //     }
-    //   } else {
-    //     print("❌ Rol kontrolü başarısız: ${result.exception.toString()}");
-    //   }
+    if (!result.hasException) {
+      final currentRole = result.data?["employee"]?["role"];
+      if (currentRole == "misafir") {
+        CustomSnackBar.errorSnackBar(
+            title: "Oturumunuz sonlandı", message: "Yetkiniz kaldırıldı!");
+        await logoutUser();
+      }
+    } else {
+      print("❌ Rol kontrolü başarısız: ${result.exception.toString()}");
+    }
   }
 }

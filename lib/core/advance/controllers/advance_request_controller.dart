@@ -40,7 +40,8 @@ class RequestAdvanceController extends GetxController {
       ));
 
       if (result.hasException) {
-        Get.snackbar("Hata", result.exception.toString());
+        CustomSnackBar.errorSnackBar(
+            title: "Hata", message: "Bir şeyler yanlış gitti.");
       } else {
         CustomSnackBar.successSnackBar(
             title: "Başarılı İşlem!",
@@ -49,7 +50,8 @@ class RequestAdvanceController extends GetxController {
         reasonController.clear();
       }
     } catch (e) {
-      Get.snackbar("Hata", e.toString());
+      CustomSnackBar.errorSnackBar(
+          title: "Hata", message: "Bir şeyler yanlış gitti.");
     } finally {
       isSaving.value = false;
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/transactions/transaction_controller.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class TransactionActionButtons extends StatelessWidget {
   final Color mainColor;
@@ -82,8 +83,9 @@ void showTransactionDialog(
                   type: type, amount: amount, description: desc);
               Navigator.pop(context);
             } else {
-              Get.snackbar(
-                  "Hata", "Lütfen geçerli bir tutar ve açıklama girin.");
+              CustomSnackBar.errorSnackBar(
+                  title: "Hata",
+                  message: "Lütfen geçerli bir tutar ve açıklama girin.");
             }
           },
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/core/user_info_controller.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class PasswordChangeScreen extends StatelessWidget {
   const PasswordChangeScreen({super.key});
@@ -56,7 +57,8 @@ class PasswordChangeScreen extends StatelessWidget {
                       : () async {
                           if (passwordController.text !=
                               confirmController.text) {
-                            Get.snackbar("Hata", "Şifreler eşleşmiyor");
+                            CustomSnackBar.errorSnackBar(
+                                title: "Hata", message: "Şifreler eşleşmiyor");
                             return;
                           }
                           await controller.updateMyInfo(

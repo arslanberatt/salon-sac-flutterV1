@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/core/appointments/appointment_controller.dart';
 import 'package:mobil/core/employees/employees_controller.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class AppointmentLoadingScreen extends StatelessWidget {
   const AppointmentLoadingScreen({super.key});
@@ -16,7 +17,8 @@ class AppointmentLoadingScreen extends StatelessWidget {
         userId: "temporary",
         userRole: "calisan",
       );
-      Get.snackbar("Hata", "Veriler yüklenemedi");
+      CustomSnackBar.errorSnackBar(
+          title: "Hata", message: "Veriler yüklenemedi");
       return;
     }
 

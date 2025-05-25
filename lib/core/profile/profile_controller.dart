@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../utils/services/graphql_service.dart';
 
 class ProfileController extends GetxController {
@@ -36,13 +37,15 @@ class ProfileController extends GetxController {
       ));
 
       if (result.hasException) {
-        Get.snackbar("Hata", result.exception.toString());
+        CustomSnackBar.errorSnackBar(
+            title: "Hata", message: result.exception.toString());
       } else {
-        Get.snackbar("Başarılı", "Profil güncellendi");
+        CustomSnackBar.successSnackBar(
+            title: "Başarılı", message: "Profil güncellendi");
         passwordController.clear();
       }
     } catch (e) {
-      Get.snackbar("Hata", e.toString());
+      CustomSnackBar.errorSnackBar(title: "Hata", message: e.toString());
     } finally {
       isSaving.value = false;
     }

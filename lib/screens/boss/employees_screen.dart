@@ -81,9 +81,6 @@ class EmployeesScreen extends StatelessWidget {
         }
 
         final allEmployees = employeeController.employees;
-        final bosses = allEmployees
-            .where((e) => e["role"]?.toUpperCase() == "PATRON")
-            .toList();
         final workers = allEmployees
             .where((e) => e["role"]?.toUpperCase() == "CALISAN")
             .toList();
@@ -98,24 +95,6 @@ class EmployeesScreen extends StatelessWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             children: [
-              if (bosses.isNotEmpty) ...[
-                const SectionTitle(title: "Patronlar"),
-                ...bosses.map((emp) => ZenithProjectCard(
-                      employee: emp,
-                      onTap: () async {
-                        final result = await Get.to(
-                            () => EmployeeDetailScreen(employee: emp));
-                        if (result is Map<String, dynamic>) {
-                          final index = employeeController.employees
-                              .indexWhere((e) => e["id"] == result["id"]);
-                          if (index != -1) {
-                            employeeController.employees[index] = result;
-                            employeeController.employees.refresh();
-                          }
-                        }
-                      },
-                    )),
-              ],
               if (workers.isNotEmpty) ...[
                 const SectionTitle(title: "Çalışanlar"),
                 ...workers.map((emp) => ZenithProjectCard(
@@ -171,7 +150,6 @@ class ZenithProjectCard extends StatelessWidget {
     final String phone = employee["phone"] ?? "-";
     final double salary = (employee["salary"] ?? 0).toDouble();
     final double commissionRate = (employee["commissionRate"] ?? 0).toDouble();
-    final double advanceBalance = (employee["advanceBalance"] ?? 0).toDouble();
     final double monthlyBonus = (employee["monthlyBonus"] ?? 0).toDouble();
     final double monthlyAdvance = (employee["monthlyAdvance"] ?? 0).toDouble();
     final double netThisMonth = (employee["netThisMonth"] ?? 0).toDouble();

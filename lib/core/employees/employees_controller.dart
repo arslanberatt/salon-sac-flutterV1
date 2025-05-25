@@ -127,7 +127,8 @@ class EmployeesController extends GetxController {
     } catch (e, stacktrace) {
       print("❌ fetchEmployees() exception: $e");
       print("📍Stacktrace: $stacktrace");
-      Get.snackbar("Hata", "Çalışanlar veya maaş kayıtları yüklenemedi");
+      CustomSnackBar.errorSnackBar(
+          title: "Hata", message: "Çalışanlar veya maaş kayıtları yüklenemedi");
     } finally {
       loading.value = false;
     }
