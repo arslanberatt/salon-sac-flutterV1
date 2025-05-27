@@ -49,7 +49,6 @@ class AppointmentScreen extends StatelessWidget {
                   controller.setSelectedDate(normalized);
                 },
                 calendarStyle: CalendarStyle(
-                  // Seçili gün rengi ve arka planı
                   selectedDecoration: BoxDecoration(
                     color: ProjectColors.main2Color,
                     shape: BoxShape.circle,
@@ -58,8 +57,6 @@ class AppointmentScreen extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
-
-                  // Bugünün rengi ve yazı tipi
                   todayDecoration: BoxDecoration(
                     color: Colors.blue.shade200,
                     shape: BoxShape.circle,
@@ -68,24 +65,16 @@ class AppointmentScreen extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
-
-                  // Marker stili (event/işaretler için)
                   markerDecoration: const BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
                   ),
-
-                  // Boş günlerin yazı stili
                   defaultTextStyle: const TextStyle(
                     color: Colors.black87,
                   ),
-
-                  // Hafta sonları için özel stil
                   weekendTextStyle: const TextStyle(
                     color: Colors.redAccent,
                   ),
-
-                  // Takvim hücre padding/margini (isteğe bağlı)
                   cellMargin: const EdgeInsets.all(4),
                 ),
               ),
@@ -101,6 +90,8 @@ class AppointmentScreen extends StatelessWidget {
                           itemCount: controller.filteredAppointments.length,
                           itemBuilder: (context, index) {
                             final appt = controller.filteredAppointments[index];
+
+                            print("Appointment: ${appt['notes']}");
                             return Column(
                               children: [
                                 AppointmentCard(
@@ -118,6 +109,7 @@ class AppointmentScreen extends StatelessWidget {
                                   services: controller
                                       .getServicesByIds(appt['serviceIds']),
                                   status: appt['status'],
+                                  notes: appt['notes'] ?? '',
                                 ),
                                 const SizedBox(
                                     height: ProjectSizes.containerPaddingS),

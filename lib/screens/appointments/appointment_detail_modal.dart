@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/appointments/update_appointment_controller.dart';
 import 'package:mobil/screens/appointments/appointment_status_actions.dart';
 import 'package:mobil/screens/appointments/edit_appointment_screen.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 
 void showAppointmentDetailModal(
   BuildContext context, {
@@ -15,6 +16,7 @@ void showAppointmentDetailModal(
   required String duration,
   required String status,
   required List<Map<String, dynamic>> services,
+  required String notes,
 }) {
   final controller = Get.put(UpdateAppointmentController());
   controller.appointmentStatus.value = status;
@@ -63,7 +65,7 @@ void showAppointmentDetailModal(
               ],
             ),
             const SizedBox(height: 8),
-            Text("Müşteri: $customer",
+            Text("$customer",
                 style: const TextStyle(fontSize: 16, color: Colors.black87)),
             const Divider(height: 32),
             Row(
@@ -114,6 +116,15 @@ void showAppointmentDetailModal(
                       ))
                   .toList(),
             ),
+            SizedBox(height: ProjectSizes.spaceBtwItems),
+            const Text("Notlar",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black)),
+            const SizedBox(height: 12),
+            Text(notes,
+                style: const TextStyle(fontSize: 14, color: Colors.black87)),
             const SizedBox(height: 32),
             AppointmentStatusActions(
                 appointmentId: appointmentId, status: status),

@@ -15,7 +15,6 @@ class AddCustomerScreen extends StatelessWidget {
       session.autoLogoutIfGuest();
     });
     return Scaffold(
-      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,

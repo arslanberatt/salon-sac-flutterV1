@@ -18,7 +18,6 @@ class AddAppointmentScreen extends StatelessWidget {
     final session = Get.find<UserSessionController>();
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -70,14 +69,43 @@ class AddAppointmentScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                /// 👤 Çalışan Bilgisi
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Text(
-                    "Çalışan: ${session.name.value}",
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                ),
+                /// 👨‍💼 Çalışan Seçimi (Rol Bazlı)
+                session.role.value == 'patron'
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Çalışan Seç",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          DropdownButtonFormField<String>(
+                            value:
+                                controller.selectedEmployeeId.value.isNotEmpty
+                                    ? controller.selectedEmployeeId.value
+                                    : null,
+                            items: controller.employees.map((e) {
+                              return DropdownMenuItem<String>(
+                                value: e['id'],
+                                child: Text(e['name']),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              if (val != null)
+                                controller.selectedEmployeeId.value = val;
+                            },
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Çalışan Seç',
+                            ),
+                          ),
+                        ],
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          "Çalışan: ${session.name.value}",
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ),
 
                 const SizedBox(height: 16),
 
@@ -192,16 +220,18 @@ class AddAppointmentScreen extends StatelessWidget {
                                   Get.find<AppointmentController>()
                                       .fetchAppointments();
                                   CustomSnackBar.successSnackBar(
-                                      title: "Başarılı",
-                                      message: "Randevu oluşturuldu!");
+                                    title: "Başarılı",
+                                    message: "Randevu oluşturuldu!",
+                                  );
                                   Get.back();
                                 } else {
                                   CustomSnackBar.errorSnackBar(
-                                      title: "Eksik Alan",
-                                      message: controller
-                                              .selectedCustomerId.value.isEmpty
-                                          ? "Lütfen müşteri seçin."
-                                          : "En az bir hizmet seçin.");
+                                    title: "Eksik Alan",
+                                    message: controller
+                                            .selectedCustomerId.value.isEmpty
+                                        ? "Lütfen müşteri seçin."
+                                        : "En az bir hizmet seçin.",
+                                  );
                                 }
                               },
                         child: controller.loading.value

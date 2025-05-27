@@ -20,7 +20,6 @@ class BossHomeScreen extends StatelessWidget {
     final userInfoController = Get.put(UserInfoController());
 
     return Scaffold(
-      backgroundColor: ProjectColors.backColor,
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: BossAppBar(),

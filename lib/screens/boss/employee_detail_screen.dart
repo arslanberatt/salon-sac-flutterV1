@@ -14,7 +14,6 @@ class EmployeeDetailScreen extends StatelessWidget {
     final controller = Get.put(EmployeeDetailController(employee: employee));
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -75,7 +74,6 @@ class EmployeeDetailScreen extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          // Güncelle Butonu
           Obx(() => controller.isSaving.value
               ? const Center(child: CircularProgressIndicator())
               : SizedBox(

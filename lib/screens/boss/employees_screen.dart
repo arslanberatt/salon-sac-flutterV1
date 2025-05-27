@@ -15,7 +15,6 @@ class EmployeesScreen extends StatelessWidget {
     final advanceApprovalController = Get.put(AdvanceApprovalController());
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -76,10 +75,6 @@ class EmployeesScreen extends StatelessWidget {
         ],
       ),
       body: Obx(() {
-        if (employeeController.loading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         final allEmployees = employeeController.employees;
         final workers = allEmployees
             .where((e) => e["role"]?.toUpperCase() == "CALISAN")

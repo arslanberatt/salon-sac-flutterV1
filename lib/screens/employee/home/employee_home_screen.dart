@@ -126,6 +126,7 @@ class EmployeeHomeScreen extends StatelessWidget {
                                   services:
                                       appointmentController.getServicesByIds(
                                           appt['serviceIds'] ?? []),
+                                  notes: appt['notes'] ?? '',
                                 ),
                                 SizedBox(
                                   height: ProjectSizes.containerPaddingS,

@@ -4,7 +4,6 @@ import 'package:mobil/screens/boss/manage_service_screen.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
 import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/profile_screen.dart';
-import 'package:mobil/screens/employee/salary_record_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
 import 'package:mobil/screens/boss/transaction_screen.dart';
 import 'package:get/get.dart';
@@ -40,7 +39,6 @@ class AppRoutes {
     GetPage(name: advanceRequests, page: () => const RequestAdvanceScreen()),
     GetPage(name: advanceApproval, page: () => const AdvanceApprovalScreen()),
     GetPage(name: transaction, page: () => TransactionScreen()),
-    GetPage(name: salaryRecord, page: () => const SalaryRecordScreen()),
     GetPage(name: profile, page: () => const ProfileScreen()),
     GetPage(name: settings, page: () => const SettingsScreen()),
     GetPage(name: listService, page: () => ManageServicesScreen()),

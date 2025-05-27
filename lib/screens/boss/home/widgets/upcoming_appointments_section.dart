@@ -55,6 +55,7 @@ class _AppointmentList extends StatelessWidget {
             ),
             appointmentId: appt['id'],
             services: controller.getServicesByIds(appt['serviceIds'] ?? []),
+            notes: appt['notes'] ?? '',
           ),
         );
       },

@@ -25,7 +25,6 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -42,10 +41,6 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
         ),
       ),
       body: Obx(() {
-        if (controller.loading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         return Padding(
           padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
@@ -54,7 +49,7 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
                 const SizedBox(height: ProjectSizes.spaceBtwItems),
                 Row(
                   children: [
-                    Text("Yeni Müşteri",
+                    Text("Randevu Düzenle",
                         style: Theme.of(context).textTheme.titleLarge),
                   ],
                 ),

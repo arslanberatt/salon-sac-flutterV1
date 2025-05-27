@@ -6,7 +6,6 @@ import '../../utils/theme/widget_themes/custom_snackbar.dart';
 
 class EditAppointmentController extends GetxController {
   final loading = false.obs;
-
   final notesController = TextEditingController();
   final selectedDateTime = Rxn<DateTime>();
 

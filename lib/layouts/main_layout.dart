@@ -8,7 +8,6 @@ import 'package:mobil/screens/boss/employees_screen.dart';
 import 'package:mobil/screens/common/settings_screen.dart';
 import 'package:mobil/screens/employee/employee_salary_screen.dart';
 import 'package:mobil/screens/employee/home/employee_home_screen.dart';
-import 'package:mobil/screens/employee/salary_record_screen.dart';
 import 'package:mobil/utils/constants/sizes.dart';
 
 class MainLayout extends StatefulWidget {
@@ -42,10 +41,10 @@ class _MainLayoutState extends State<MainLayout> {
     final bool isPatron = session.isPatron;
 
     final List<Widget> screens = isPatron
-        ? const [
-            BossHomeScreen(),
-            AppointmentScreen(),
-            EmployeesScreen(),
+        ? [
+            const BossHomeScreen(),
+            const AppointmentScreen(),
+            const EmployeesScreen(),
             SettingsScreen(),
           ]
         : [

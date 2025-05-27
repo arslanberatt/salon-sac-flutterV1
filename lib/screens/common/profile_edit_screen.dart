@@ -18,7 +18,6 @@ class ProfileEditScreen extends StatelessWidget {
     final phoneController = TextEditingController(text: controller.phone.value);
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.white,

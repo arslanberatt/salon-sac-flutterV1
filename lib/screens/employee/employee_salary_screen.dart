@@ -4,7 +4,6 @@ import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/screens/boss/home/widgets/boss_app_bar.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
 import 'package:mobil/utils/constants/colors.dart';
-import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 import '../../core/salary/employee_salary_controller.dart';
 
 class EmployeeSalaryScreen extends StatelessWidget {
@@ -16,16 +15,11 @@ class EmployeeSalaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(249, 255, 255, 255),
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: BossAppBar(),
       ),
       body: Obx(() {
-        if (session.id.isEmpty || controller.loading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         final gross = controller.employeeSalary.value;
         final advance = controller.totalAdvance.value;
         final net = controller.netSalary.value;

@@ -15,7 +15,6 @@ class AdvanceApprovalScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Color.fromARGB(249, 255, 255, 255),
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.white,

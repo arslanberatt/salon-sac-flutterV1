@@ -23,16 +23,11 @@ class SettingsScreen extends StatelessWidget {
     controller.fetchUserInfo();
 
     return Scaffold(
-      backgroundColor: ProjectColors.backColor,
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: BossAppBar(),
       ),
       body: Obx(() {
-        if (controller.loading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
         return ListView(
           children: [
             Container(
@@ -95,12 +90,16 @@ class SettingsScreen extends StatelessWidget {
             }),
             _buildDivider(),
 
-            _buildItem(Icons.support_agent, "İletişim", () {
-              CustomSnackBar.warningSnackBar(
-                title: "İletişim",
-                message: "İletişim için: arslanberattdev@gmail.com",
-              );
-            }),
+            _buildItem(
+              Icons.support_agent,
+              "İletişim",
+              () {
+                CustomSnackBar.warningSnackBar(
+                    title: "İletişim",
+                    message: "İletişim için: arslanberattdev@gmail.com",
+                    duration: 5);
+              },
+            ),
             _buildDivider(),
 
             _buildItem(

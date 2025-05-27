@@ -12,6 +12,7 @@ class AppointmentCard extends StatelessWidget {
   final String appointmentId;
   final List<Map<String, dynamic>> services;
   final String status;
+  final String notes;
 
   const AppointmentCard({
     super.key,
@@ -23,6 +24,7 @@ class AppointmentCard extends StatelessWidget {
     required this.appointmentId,
     required this.services,
     required this.status,
+    required this.notes,
   });
 
   @override
@@ -42,6 +44,7 @@ class AppointmentCard extends StatelessWidget {
         duration: duration,
         services: services,
         status: status,
+        notes: notes,
       ),
       child: Card(
         color: Colors.white,

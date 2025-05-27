@@ -13,7 +13,7 @@ class SplashScreen extends StatelessWidget {
 
   Future<void> checkAuth() async {
     final token = await storage.read(key: "token");
-    await Future.delayed(const Duration(seconds: 1)); // Splash efekti için
+    await Future.delayed(const Duration(milliseconds: 200));
 
     if (token == null) {
       Get.offAllNamed('/login');
@@ -63,7 +63,7 @@ class SplashScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Lottie.asset(
-          "assets/animations/loading.json",
+          "assets/animations/appointment.json",
           width: 150,
           height: 150,
           fit: BoxFit.cover,

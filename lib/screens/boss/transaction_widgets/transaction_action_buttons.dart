@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/transactions/transaction_controller.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
 class TransactionActionButtons extends StatelessWidget {
@@ -61,6 +62,7 @@ void showTransactionDialog(
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(labelText: "Tutar (₺)"),
           ),
+          const SizedBox(height: ProjectSizes.spaceBtwItems),
           TextField(
             controller: descController,
             decoration: const InputDecoration(labelText: "Açıklama"),

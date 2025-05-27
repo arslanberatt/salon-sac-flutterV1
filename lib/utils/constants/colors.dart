@@ -19,7 +19,7 @@ class ProjectColors {
   static const Color main3Color = Color.fromRGBO(75, 135, 180, 1);
 
   //Background renkleri
-  static const Color backColor = Color.fromARGB(228, 253, 250, 250);
+  static const Color backColor = Color.fromARGB(227, 255, 255, 255);
   static const Color back1Color = Color.fromRGBO(245, 246, 246, 1);
   //Red
   static const Color red3Color = Color(0xffFFCBD3);

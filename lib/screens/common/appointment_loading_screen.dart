@@ -37,7 +37,6 @@ class AppointmentLoadingScreen extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) => loadDataAndRedirect());
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: Lottie.asset(
           "assets/animations/appointment.json",

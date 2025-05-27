@@ -68,12 +68,16 @@ class AddAppointmentController extends GetxController {
         client.query(QueryOptions(
             document:
                 gql("""query { services { id title duration price } }"""))),
+        client.query(
+            QueryOptions(document: gql("""query { employees { id name } }"""))),
       ]);
 
       customers.value =
           List<Map<String, dynamic>>.from(results[0].data?['customers'] ?? []);
       services.value =
           List<Map<String, dynamic>>.from(results[1].data?['services'] ?? []);
+      employees.value =
+          List<Map<String, dynamic>>.from(results[2].data?['employees'] ?? []);
     } catch (e) {
       print("❌ Veri çekme hatası: $e");
     } finally {
@@ -131,7 +135,7 @@ class AddAppointmentController extends GetxController {
     return false;
   }
 
-  /// --- Randevu oluştur ---
+  /// --- Randevu oluştur --
   Future<bool> submitAppointment() async {
     if (selectedCustomerId.isEmpty ||
         selectedServiceIds.isEmpty ||
@@ -155,6 +159,8 @@ class AddAppointmentController extends GetxController {
           'totalPrice': totalPrice,
           'notes': notes.value.isEmpty ? null : notes.value,
         },
+        fetchPolicy: FetchPolicy.noCache,
+        onCompleted: (data) => Get.back(result: true),
       ));
 
       if (result.hasException) {
@@ -186,7 +192,6 @@ class AddAppointmentController extends GetxController {
       CustomSnackBar.successSnackBar(
           title: "Başarılı", message: "Randevu oluşturuldu.");
       Get.find<AppointmentController>().fetchAppointments(); // otomatik yenile
-      Get.back();
       return true;
     } catch (e) {
       print("❌ Submit error: $e");
@@ -205,7 +210,9 @@ class AddAppointmentController extends GetxController {
     super.onInit();
     fetchAllData();
     final session = Get.find<UserSessionController>();
-    selectedEmployeeId.value = session.id.value; // 🔒 Sabit çalışan ID
+    if (session.role.value == 'employee') {
+      selectedEmployeeId.value = session.id.value;
+    }
   }
 
   @override

@@ -20,7 +20,6 @@ class TransactionScreen extends StatelessWidget {
       final balance = totalIncome - totalExpense;
 
       return Scaffold(
-        backgroundColor: const Color.fromARGB(249, 255, 255, 255),
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Colors.white,
