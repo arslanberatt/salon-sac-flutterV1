@@ -66,50 +66,34 @@ class AddAppointmentScreen extends StatelessWidget {
                     controller.customerNameController.text = suggestion['name'];
                   },
                 ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: session.isPatron
+                      ? (controller.selectedEmployeeId.value.isNotEmpty
+                          ? controller.selectedEmployeeId.value
+                          : null)
+                      : session.id.value,
+                  items: controller.employees
+                      .where((e) =>
+                          session.isPatron || e['id'] == session.id.value)
+                      .map((e) => DropdownMenuItem<String>(
+                            value: e['id'],
+                            child: Text(e['name']),
+                          ))
+                      .toList(),
+                  onChanged: session.isPatron
+                      ? (val) {
+                          if (val != null)
+                            controller.selectedEmployeeId.value = val;
+                        }
+                      : null,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Çalışan',
+                  ),
+                ),
 
                 const SizedBox(height: 16),
-
-                /// 👨‍💼 Çalışan Seçimi (Rol Bazlı)
-                session.role.value == 'patron'
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("Çalışan Seç",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 8),
-                          DropdownButtonFormField<String>(
-                            value:
-                                controller.selectedEmployeeId.value.isNotEmpty
-                                    ? controller.selectedEmployeeId.value
-                                    : null,
-                            items: controller.employees.map((e) {
-                              return DropdownMenuItem<String>(
-                                value: e['id'],
-                                child: Text(e['name']),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null)
-                                controller.selectedEmployeeId.value = val;
-                            },
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Çalışan Seç',
-                            ),
-                          ),
-                        ],
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(
-                          "Çalışan: ${session.name.value}",
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-
-                const SizedBox(height: 16),
-
-                /// 💇 Hizmet Seçimi
                 const Text("Hizmetler",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),

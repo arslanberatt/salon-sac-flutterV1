@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobil/screens/boss/transaction_widgets/transaction_list.dart';
 import 'package:mobil/screens/boss/transaction_widgets/transaction_summary_card.dart';
+import 'package:mobil/utils/constants/sizes.dart';
 import '../../core/transactions/transaction_controller.dart';
 
 class TransactionScreen extends StatelessWidget {
@@ -126,6 +127,9 @@ class TransactionScreen extends StatelessWidget {
               controller: amountController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: 'Tutar'),
+            ),
+            const SizedBox(
+              height: ProjectSizes.spaceBtwItems,
             ),
             TextField(
               controller: descController,

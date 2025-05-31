@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:mobil/core/core/user_session_controller.dart';
 import 'package:mobil/screens/boss/home/widgets/boss_app_bar.dart';
 import 'package:mobil/screens/employee/advance_request_screen.dart';
@@ -19,92 +20,92 @@ class EmployeeSalaryScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: BossAppBar(),
       ),
-      body: Obx(() {
-        final gross = controller.employeeSalary.value;
-        final advance = controller.totalAdvance.value;
-        final net = controller.netSalary.value;
+      body: RefreshIndicator(
+        onRefresh:
+            controller.fetchEmployeeSalaryData, // yenileme metodu çağrılır
+        child: Obx(() {
+          final gross = controller.employeeSalary.value;
+          final advance = controller.totalAdvance.value;
+          final bonus = controller.totalBonus.value;
+          final net = controller.netSalary.value;
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              /// Görsel
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  "assets/images/kasa.png",
-                  height: 120,
-                  width: 120,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              /// Özet Kart
-              Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      buildSummaryRow("Brüt Maaş", gross),
-                      buildSummaryRow("Toplam Avans", advance),
-                      const Divider(height: 32),
-                      buildSummaryRow("Net Maaş", net, isBold: true),
-                    ],
+                  child: Image.asset(
+                    "assets/images/kasa.png",
+                    height: 120,
+                    width: 120,
+                    fit: BoxFit.cover,
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 24),
-
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  "Bu maaş bilgileri sistemden alınan en güncel verilere dayanmaktadır. Net maaş, avans düşülerek hesaplanır.",
-                  style: TextStyle(fontSize: 13, color: Colors.black87),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ProjectColors.main2Color,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                const SizedBox(height: 20),
+                Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  onPressed: () {
-                    Get.to(() => RequestAdvanceScreen());
-                  },
-                  label: const Text(
-                    "Avans Talep Et",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        buildSummaryRow("Maaş", gross - bonus),
+                        buildSummaryRow("Toplam Prim", bonus),
+                        buildSummaryRow("Toplam Avans", advance),
+                        const Divider(height: 32),
+                        buildSummaryRow("Net Maaş", net, isBold: true),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-
-          /// 🔘 Avans Talep Et Butonu
-        );
-      }),
+                const SizedBox(height: 24),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    "Net maaş; brüt maaşınızdan bu ayki onaylı avansların düşülüp, bu ayki onaylı primlerin eklenmesiyle hesaplanır.",
+                    style: TextStyle(fontSize: 13, color: Colors.black87),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ProjectColors.main2Color,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {
+                      Get.to(() => RequestAdvanceScreen());
+                    },
+                    icon: Icon(Iconsax.add),
+                    label: const Text(
+                      "Avans Talep Et",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 

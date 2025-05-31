@@ -56,18 +56,38 @@ class AdvanceApprovalController extends GetxController {
         return;
       }
 
-      final allData =
+      final rawData =
           List<Map<String, dynamic>>.from(result.data!['advanceRequests']);
-      advanceList.value = allData;
 
-      // 🔎 Beklemede olanları ayıkla
+      // ✅ createdAt'e göre sıralama (en yeni en üstte)
+      rawData.sort((a, b) {
+        final aDate = _parseDate(a['createdAt']);
+        final bDate = _parseDate(b['createdAt']);
+        return bDate.compareTo(aDate);
+      });
+
+      advanceList.value = rawData;
       advanceWaitList.value =
-          allData.where((e) => e['status'] == 'beklemede').toList();
+          rawData.where((e) => e['status'] == 'beklemede').toList();
     } catch (e) {
       print("❌ Hata: $e");
     } finally {
       loading.value = false;
     }
+  }
+
+  DateTime _parseDate(dynamic rawDate) {
+    if (rawDate == null) return DateTime(2000);
+
+    if (rawDate is int) {
+      return DateTime.fromMillisecondsSinceEpoch(rawDate);
+    }
+
+    if (rawDate is String && RegExp(r'^\d+$').hasMatch(rawDate)) {
+      return DateTime.fromMillisecondsSinceEpoch(int.parse(rawDate));
+    }
+
+    return DateTime.tryParse(rawDate.toString()) ?? DateTime(2000);
   }
 
   Future<void> updateStatus(String id, bool approve) async {

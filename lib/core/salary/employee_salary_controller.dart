@@ -7,6 +7,7 @@ class EmployeeSalaryController extends GetxController {
   final loading = false.obs;
   final employeeSalary = 0.0.obs;
   final totalAdvance = 0.0.obs;
+  final totalBonus = 0.0.obs;
   final netSalary = 0.0.obs;
 
   final userSession = Get.find<UserSessionController>();
@@ -53,7 +54,7 @@ class EmployeeSalaryController extends GetxController {
     """;
 
     try {
-      /// 1. Çalışanın maaş bilgisini çek
+      /// 1. Maaş bilgisini çek
       final employeeResult = await client.query(QueryOptions(
         document: gql(employeeQuery),
         variables: {"id": employeeId},
@@ -63,11 +64,12 @@ class EmployeeSalaryController extends GetxController {
       if (!employeeResult.hasException) {
         final salary = employeeResult.data?['employee']?['salary'];
         employeeSalary.value = (salary ?? 0).toDouble();
+        print("💰 Brüt Maaş: ${employeeSalary.value}");
       } else {
         print("❌ Çalışan maaş sorgusu hatası: ${employeeResult.exception}");
       }
 
-      /// 2. Tüm salaryRecords çekilip filtrelenir
+      /// 2. Salary record'ları çek
       final salaryResult = await client.query(QueryOptions(
         document: gql(salaryRecordsQuery),
         fetchPolicy: FetchPolicy.noCache,
@@ -78,22 +80,40 @@ class EmployeeSalaryController extends GetxController {
           salaryResult.data?['salaryRecords'] ?? [],
         );
 
-        final myRecords = records
-            .where((e) =>
-                e['employeeId'] == employeeId &&
-                e['type'] == 'avans' &&
-                e['approved'] == true)
-            .toList();
+        print("📦 Tüm Salary Record Verileri:");
+        for (var e in records) {
+          print("🧾 ID: ${e['id']}, EmployeeID: ${e['employeeId']}, Type: ${e['type']}, Amount: ${e['amount']}, Approved: ${e['approved']}, Desc: ${e['description']}, Date: ${e['date']}");
+        }
 
-        final total =
-            myRecords.fold(0.0, (sum, e) => sum + (e['amount'] ?? 0.0));
-        totalAdvance.value = total;
+        /// Sadece bu çalışana ait kayıtlar
+        final myRecords = records.where((e) => e['employeeId'] == employeeId).toList();
+
+        /// ✅ Avans hesapla
+        final myAdvances = myRecords.where((e) {
+          final type = (e['type'] ?? '').toString().toLowerCase();
+          return type == 'avans' && e['approved'] == true;
+        }).toList();
+
+        final advanceTotal = myAdvances.fold(0.0, (sum, e) => sum + (e['amount'] ?? 0.0));
+        totalAdvance.value = advanceTotal;
+        print("✅ Avans Toplamı: $advanceTotal");
+
+        /// ✅ Prim hesapla
+        final myBonuses = myRecords.where((e) {
+          final type = (e['type'] ?? '').toString().toLowerCase();
+          return type == 'prim' && e['approved'] == true;
+        }).toList();
+
+        final bonusTotal = myBonuses.fold(0.0, (sum, e) => sum + (e['amount'] ?? 0.0));
+        totalBonus.value = bonusTotal;
+        print("✅ Prim Toplamı: $bonusTotal");
+
+        /// 📊 Net maaş = maaş - avans + prim
+        netSalary.value = employeeSalary.value - totalAdvance.value + totalBonus.value;
+        print("📊 Net Maaş: ₺${netSalary.value}");
       } else {
         print("❌ Salary record sorgusu hatası: ${salaryResult.exception}");
       }
-
-      /// 3. Net maaş hesapla
-      netSalary.value = employeeSalary.value - totalAdvance.value;
     } catch (e) {
       print("❌ Beklenmeyen hata: $e");
     } finally {

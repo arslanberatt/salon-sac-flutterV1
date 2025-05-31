@@ -6,16 +6,17 @@ import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 class AppointmentStatusActions extends StatelessWidget {
   final String appointmentId;
   final String status;
-  const AppointmentStatusActions({
+  AppointmentStatusActions({
     super.key,
     required this.appointmentId,
     required this.status,
   });
 
+  final TextEditingController priceController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<UpdateAppointmentController>();
-    final priceController = TextEditingController();
 
     if (status == "tamamlandi" || status == "iptal") return const SizedBox();
 
@@ -32,6 +33,9 @@ class AppointmentStatusActions extends StatelessWidget {
             border: OutlineInputBorder(),
             hintText: "Örn: 250",
           ),
+          onSubmitted: (_) {
+            FocusScope.of(context).unfocus(); // klavyeyi kapat
+          },
         ),
         const SizedBox(height: 24),
         Row(

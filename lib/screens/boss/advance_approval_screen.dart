@@ -15,57 +15,14 @@ class AdvanceApprovalScreen extends StatelessWidget {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: const Text(
-            "SALON SAÇ",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-              fontFamily: 'Teko',
-              color: Colors.black87,
-            ),
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(60),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white, // Arka plan mavi
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: TabBar(
-                  dividerColor: Colors.transparent,
-                  indicator: BoxDecoration(
-                    color: Colors.blue, // Seçili tab arka plan
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.black,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                  tabs: const [
-                    Tab(text: "Tümü"),
-                    Tab(text: "Beklemede"),
-                    Tab(text: "Onaylanan"),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+        appBar: _buildAppBar(),
         body: Obx(() {
           if (controller.loading.value) {
             return const Center(child: LoaderAdvance());
           }
 
           return TabBarView(
-            physics:
-                const NeverScrollableScrollPhysics(), // geçişi kaydırmasız yap
+            physics: const NeverScrollableScrollPhysics(),
             children: [
               _buildList(controller.advanceList, controller),
               _buildList(
@@ -87,6 +44,52 @@ class AdvanceApprovalScreen extends StatelessWidget {
     );
   }
 
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      centerTitle: true,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      title: const Text(
+        "SALON SAÇ",
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Teko',
+          letterSpacing: 1.2,
+          color: Colors.black87,
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: TabBar(
+              dividerColor: Colors.transparent,
+              indicator: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.black,
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+              tabs: const [
+                Tab(text: "Tümü"),
+                Tab(text: "Beklemede"),
+                Tab(text: "Onaylanan"),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildList(
       List<Map<String, dynamic>> list, AdvanceApprovalController controller) {
     if (list.isEmpty) {
@@ -103,14 +106,11 @@ class AdvanceApprovalScreen extends StatelessWidget {
         final isPending = item['status'] == 'beklemede';
 
         return Container(
-          color: isPending
-              ? const Color.fromRGBO(243, 244, 246, 1)
-              : Colors.transparent,
+          color: isPending ? const Color(0xFFF3F4F6) : Colors.transparent,
           padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Üst bilgi
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -125,7 +125,7 @@ class AdvanceApprovalScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          employee['name'],
+                          employee['name'] ?? 'Bilinmeyen',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -144,12 +144,12 @@ class AdvanceApprovalScreen extends StatelessWidget {
                               ),
                               const TextSpan(
                                 text: " tutarında avans talep etti.",
-                                style: const TextStyle(color: Colors.black),
+                                style: TextStyle(color: Colors.black),
                               ),
                             ],
                           ),
                         ),
-                        if ((item['reason'] ?? "").toString().isNotEmpty)
+                        if ((item['reason'] ?? '').toString().isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 2),
                             child: Text(
@@ -161,45 +161,41 @@ class AdvanceApprovalScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    child: Padding(
-                      padding: const EdgeInsets.all(ProjectSizes.s),
-                      child: Text(
-                        _formatDate(item['createdAt']),
-                        style: TextStyle(
-                            color: Colors.grey.shade800, fontSize: 12),
-                      ),
-                    ),
+                    padding: const EdgeInsets.all(ProjectSizes.s),
                     decoration: BoxDecoration(
                       color: _getStatusColor(item['status']).withOpacity(0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    child: Text(
+                      _formatDate(item['createdAt']),
+                      style:
+                          TextStyle(color: Colors.grey.shade800, fontSize: 12),
+                    ),
                   )
                 ],
               ),
-
               const SizedBox(height: 12),
-
               if (isPending)
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     ElevatedButton(
                       onPressed: () =>
                           controller.updateStatus(item['id'], false),
                       style: ElevatedButton.styleFrom(
-                        side: const BorderSide(color: ProjectColors.main2Color),
                         backgroundColor: ProjectColors.whiteColor,
+                        side: const BorderSide(color: ProjectColors.main2Color),
                       ),
-                      child: const Text("Reddet",
-                          style: TextStyle(color: ProjectColors.main2Color)),
+                      child: const Text(
+                        "Reddet",
+                        style: TextStyle(color: ProjectColors.main2Color),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () =>
                           controller.updateStatus(item['id'], true),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                      ),
+                          backgroundColor: Colors.blue),
                       child: const Text("Onayla"),
                     ),
                   ],
@@ -218,22 +214,36 @@ class AdvanceApprovalScreen extends StatelessWidget {
       case 'reddedildi':
         return Colors.red;
       case 'beklemede':
-        return Color.fromRGBO(243, 244, 246, 1);
+        return const Color(0xFFF3F4F6);
       default:
         return Colors.transparent;
     }
   }
 
   String _formatDate(dynamic date) {
-    if (date == null) return '';
-    DateTime dt;
-    if (date is String) {
-      dt = DateTime.tryParse(date) ?? DateTime.now();
-    } else if (date is DateTime) {
-      dt = date;
-    } else {
-      return '';
+    DateTime? parsed;
+
+    if (date == null) return 'Tarih yok';
+
+    // Eğer int gibi gelirse (timestamp)
+    if (date is int) {
+      // Milisaniyeye göre hesapla
+      parsed = DateTime.fromMillisecondsSinceEpoch(date);
     }
-    return "${dt.day.toString().padLeft(2, '0')}.${dt.month.toString().padLeft(2, '0')}.${dt.year}";
+    // Eğer string ama sayıysa
+    else if (date is String && RegExp(r'^\d+$').hasMatch(date)) {
+      parsed = DateTime.fromMillisecondsSinceEpoch(int.tryParse(date) ?? 0);
+    }
+    // Eğer ISO formatlı string gelirse
+    else {
+      parsed = DateTime.tryParse(date.toString());
+    }
+
+    if (parsed == null) {
+      print("⛔ Hatalı tarih geldi: $date");
+      return 'Geçersiz';
+    }
+
+    return "${parsed.day.toString().padLeft(2, '0')}.${parsed.month.toString().padLeft(2, '0')}.${parsed.year}";
   }
 }

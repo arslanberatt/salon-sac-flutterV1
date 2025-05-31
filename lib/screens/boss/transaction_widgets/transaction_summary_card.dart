@@ -27,10 +27,6 @@ class TransactionSummaryCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          "Gelir: +${income.toStringAsFixed(2)}₺  |  Gider: -${expense.toStringAsFixed(2)}₺",
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
-        ),
       ],
     );
   }

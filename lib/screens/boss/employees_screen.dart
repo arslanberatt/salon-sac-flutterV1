@@ -240,18 +240,18 @@ class ZenithProjectCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildInfoColumn("Maaş", "₺${salary.toStringAsFixed(0)}"),
+                  _buildInfoColumn(
+                      "Maaş", "₺${(salary - monthlyBonus).toStringAsFixed(0)}"),
                 ],
               ),
 
               const SizedBox(height: 12),
 
-              // Bu Ay: Prim, Avans, Net
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildInfoColumn(
-                      "Bu Ay Prim", "₺${monthlyBonus.toStringAsFixed(0)}"),
+                      "Bu Ay Prim", "₺${(monthlyBonus).toStringAsFixed(0)}"),
                   _buildInfoColumn(
                       "Bu Ay Avans", "-₺${monthlyAdvance.toStringAsFixed(0)}"),
                   _buildInfoColumn(

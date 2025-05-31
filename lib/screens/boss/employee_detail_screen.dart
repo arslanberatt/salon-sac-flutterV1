@@ -61,7 +61,7 @@ class EmployeeDetailScreen extends StatelessWidget {
                 children: [
                   _roleCheckbox("patron", "Patron", controller),
                   _roleCheckbox("calisan", "Çalışan", controller),
-                  _roleCheckbox("misafir", "Misafir", controller),
+                  _roleCheckbox("misafir", "Çalışan değil", controller),
                 ],
               )),
           const SizedBox(height: 24),

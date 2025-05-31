@@ -89,7 +89,6 @@ class AuthController extends GetxController {
       final token = result.data!["loginEmployee"]["token"];
       final employee = result.data!["loginEmployee"]["employee"];
 
-      // Misafir ise girişe izin verme
       if (employee["role"] == "misafir") {
         CustomSnackBar.errorSnackBar(
           title: "Yetkisiz Giriş",
