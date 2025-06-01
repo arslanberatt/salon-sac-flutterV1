@@ -11,7 +11,7 @@ class AddAppointmentController extends GetxController {
   final customerNameController = TextEditingController();
   final customerFocusNode = FocusNode();
 
-  /// --- Data listeleri ---
+  /// --- Veri listeleri ---
   final customers = <Map<String, dynamic>>[].obs;
   final employees = <Map<String, dynamic>>[].obs;
   final services = <Map<String, dynamic>>[].obs;
@@ -56,20 +56,23 @@ class AddAppointmentController extends GetxController {
       .where((s) => selectedServiceIds.contains(s['id']))
       .fold(0, (sum, item) => sum + (item['duration'] as int));
 
-  /// --- Tüm verileri çek ---
+  /// --- Verileri çek ve employeeId ayarla ---
   Future<void> fetchAllData() async {
     loading.value = true;
     final client = GraphQLService.client.value;
+    final session = Get.find<UserSessionController>();
 
     try {
       final results = await Future.wait([
-        client.query(
-            QueryOptions(document: gql("""query { customers { id name } }"""))),
         client.query(QueryOptions(
-            document:
-                gql("""query { services { id title duration price } }"""))),
-        client.query(
-            QueryOptions(document: gql("""query { employees { id name } }"""))),
+            document: gql("""query { customers { id name } }"""),
+            fetchPolicy: FetchPolicy.noCache)),
+        client.query(QueryOptions(
+            document: gql("""query { services { id title duration price } }"""),
+            fetchPolicy: FetchPolicy.noCache)),
+        client.query(QueryOptions(
+            document: gql("""query { employees { id name role } }"""),
+            fetchPolicy: FetchPolicy.noCache)),
       ]);
 
       customers.value =
@@ -78,6 +81,12 @@ class AddAppointmentController extends GetxController {
           List<Map<String, dynamic>>.from(results[1].data?['services'] ?? []);
       employees.value =
           List<Map<String, dynamic>>.from(results[2].data?['employees'] ?? []);
+
+      /// Eğer çalışan ise sadece kendi ID'si kullanılmalı
+      if (session.role.value == 'employee') {
+        selectedEmployeeId.value = session.id.value;
+        print("👤 Çalışan olarak giriş yaptı: ${selectedEmployeeId.value}");
+      }
     } catch (e) {
       print("❌ Veri çekme hatası: $e");
     } finally {
@@ -85,15 +94,19 @@ class AddAppointmentController extends GetxController {
     }
   }
 
-  /// --- Çakışma ve günlük randevu kontrolü ---
+  /// --- Çakışma ve tekrar kontrolü ---
   Future<bool> hasConflictOrDuplicate() async {
     final client = GraphQLService.client.value;
     final start = selectedDateTime.value!;
     final end = start.add(Duration(minutes: totalDuration));
 
     final result = await client.query(QueryOptions(
-      document: gql(
-          """query { appointments { employeeId customerId startTime endTime status } }"""),
+      document: gql("""query {
+        appointments {
+          employeeId customerId startTime endTime status
+        }
+      }"""),
+      fetchPolicy: FetchPolicy.noCache,
     ));
 
     final appointments =
@@ -135,13 +148,24 @@ class AddAppointmentController extends GetxController {
     return false;
   }
 
-  /// --- Randevu oluştur --
+  /// --- Randevuyu gönder ---
   Future<bool> submitAppointment() async {
+    final session = Get.find<UserSessionController>();
+    print("🧪 session.id: ${session.id.value}");
+    print("🧪 selectedEmployeeId: ${selectedEmployeeId.value}");
+
+    // Çalışan ise ID'sini zorla set et (ek güvence)
+    if (session.role.value == 'employee') {
+      selectedEmployeeId.value = session.id.value;
+    }
+
     if (selectedCustomerId.isEmpty ||
         selectedServiceIds.isEmpty ||
         selectedDateTime.value == null) {
       CustomSnackBar.errorSnackBar(
-          title: "Eksik Bilgi", message: "Tüm alanları doldurun.");
+        title: "Eksik Bilgi",
+        message: "Tüm alanları doldurun.",
+      );
       return false;
     }
 
@@ -164,25 +188,28 @@ class AddAppointmentController extends GetxController {
       ));
 
       if (result.hasException) {
-        final errorMsg = result.exception?.graphqlErrors.firstOrNull?.message ??
+        final msg = result.exception?.graphqlErrors.firstOrNull?.message ??
             "Randevu oluşturulamadı.";
 
-        if (errorMsg.contains("başka bir randevusu var")) {
+        if (msg.contains("başka bir randevusu var")) {
           CustomSnackBar.errorSnackBar(
             title: "Çakışan Randevu",
-            message:
-                "Bu çalışanın seçilen saat aralığında başka bir randevusu var.",
+            message: "Bu çalışanın o saatte başka bir randevusu var.",
           );
-        } else if (errorMsg.contains("zaten bir randevu alınmış")) {
+        } else if (msg.contains("zaten bir randevu alınmış")) {
           CustomSnackBar.errorSnackBar(
             title: "Tekrarlayan Randevu",
-            message:
-                "Bu müşteriye o gün zaten bir randevu alınmış. İkinci kez ekleyemezsiniz.",
+            message: "Bu müşteriye o gün zaten bir randevu alınmış.",
+          );
+        } else if (msg.contains("sadece kendi adına")) {
+          CustomSnackBar.errorSnackBar(
+            title: "Sunucu Hatası",
+            message: "Sadece kendi adınıza randevu alabilirsiniz.",
           );
         } else {
           CustomSnackBar.errorSnackBar(
             title: "Sunucu Hatası",
-            message: errorMsg,
+            message: msg,
           );
         }
 
@@ -190,14 +217,16 @@ class AddAppointmentController extends GetxController {
       }
 
       CustomSnackBar.successSnackBar(
-          title: "Başarılı", message: "Randevu oluşturuldu.");
-      Get.find<AppointmentController>().fetchAppointments(); // otomatik yenile
+        title: "Başarılı",
+        message: "Randevu başarıyla oluşturuldu.",
+      );
+      Get.find<AppointmentController>().fetchAppointments();
       return true;
     } catch (e) {
-      print("❌ Submit error: $e");
+      print("❌ Randevu gönderim hatası: $e");
       CustomSnackBar.errorSnackBar(
         title: "Hata",
-        message: "Randevu gönderimi sırasında bir hata oluştu.",
+        message: "Randevu gönderilirken hata oluştu.",
       );
       return false;
     } finally {
@@ -209,10 +238,6 @@ class AddAppointmentController extends GetxController {
   void onInit() {
     super.onInit();
     fetchAllData();
-    final session = Get.find<UserSessionController>();
-    if (session.role.value == 'employee') {
-      selectedEmployeeId.value = session.id.value;
-    }
   }
 
   @override

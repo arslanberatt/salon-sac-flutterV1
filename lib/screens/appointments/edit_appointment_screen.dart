@@ -14,12 +14,19 @@ class EditAppointmentScreen extends StatefulWidget {
 }
 
 class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
-  final controller = Get.put(EditAppointmentController());
+  late EditAppointmentController controller;
 
   @override
   void initState() {
     super.initState();
+    controller = Get.put(EditAppointmentController());
     controller.loadAppointment(widget.appointmentId);
+  }
+
+  @override
+  void dispose() {
+    Get.delete<EditAppointmentController>(); // sayfa kapanınca controller'ı kaldır
+    super.dispose();
   }
 
   @override
@@ -41,19 +48,28 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
         ),
       ),
       body: Obx(() {
+        // Eğer veri henüz gelmemişse beklet
+        if (controller.loading.value && controller.selectedDateTime.value == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         return Padding(
           padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
             child: Column(
               children: [
                 const SizedBox(height: ProjectSizes.spaceBtwItems),
+
                 Row(
                   children: [
                     Text("Randevu Düzenle",
                         style: Theme.of(context).textTheme.titleLarge),
                   ],
                 ),
+
                 const SizedBox(height: ProjectSizes.spaceBtwItems),
+
+                /// 📝 Not Alanı
                 TextFormField(
                   controller: controller.notesController,
                   decoration: const InputDecoration(
@@ -61,8 +77,10 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
                     border: OutlineInputBorder(),
                   ),
                 ),
+
                 const SizedBox(height: 16),
 
+                /// 📅 Tarih Seçimi
                 Obx(() => ListTile(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -78,19 +96,15 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: context,
-                          initialDate: controller.selectedDateTime.value ??
-                              DateTime.now(),
-                          firstDate:
-                              DateTime.now().subtract(const Duration(days: 30)),
-                          lastDate:
-                              DateTime.now().add(const Duration(days: 30)),
+                          initialDate: controller.selectedDateTime.value ?? DateTime.now(),
+                          firstDate: DateTime.now().subtract(const Duration(days: 30)),
+                          lastDate: DateTime.now().add(const Duration(days: 30)),
                         );
                         if (picked != null) {
                           final time = await showTimePicker(
                             context: context,
                             initialTime: TimeOfDay.fromDateTime(
-                                controller.selectedDateTime.value ??
-                                    DateTime.now()),
+                                controller.selectedDateTime.value ?? DateTime.now()),
                           );
                           if (time != null) {
                             final dt = DateTime(
@@ -105,25 +119,25 @@ class _EditAppointmentScreenState extends State<EditAppointmentScreen> {
                         }
                       },
                     )),
+
                 const SizedBox(height: 24),
 
-                /// 💾 Güncelle Butonu
+                /// 💾 Kaydet Butonu
                 Obx(() => SizedBox(
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton.icon(
+                        icon: const Icon(Iconsax.save_2),
                         onPressed: controller.loading.value
                             ? null
                             : () async {
-                                final success =
-                                    await controller.updateAppointment();
+                                final success = await controller.updateAppointment();
                                 if (success) {
-                                  Get.offAllNamed('/forRefresh');
+                                  Get.offAllNamed('/forRefresh'); // Refresh page
                                 }
                               },
                         label: controller.loading.value
-                            ? const CircularProgressIndicator(
-                                color: Colors.white)
+                            ? const CircularProgressIndicator(color: Colors.white)
                             : const Text("Kaydet"),
                       ),
                     )),

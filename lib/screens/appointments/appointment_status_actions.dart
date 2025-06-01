@@ -3,22 +3,43 @@ import 'package:get/get.dart';
 import 'package:mobil/core/appointments/update_appointment_controller.dart';
 import 'package:mobil/utils/theme/widget_themes/custom_snackbar.dart';
 
-class AppointmentStatusActions extends StatelessWidget {
+class AppointmentStatusActions extends StatefulWidget {
   final String appointmentId;
   final String status;
-  AppointmentStatusActions({
+
+  const AppointmentStatusActions({
     super.key,
     required this.appointmentId,
     required this.status,
   });
 
-  final TextEditingController priceController = TextEditingController();
+  @override
+  State<AppointmentStatusActions> createState() =>
+      _AppointmentStatusActionsState();
+}
+
+class _AppointmentStatusActionsState extends State<AppointmentStatusActions> {
+  late final TextEditingController priceController;
+
+  @override
+  void initState() {
+    super.initState();
+    priceController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    priceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<UpdateAppointmentController>();
 
-    if (status == "tamamlandi" || status == "iptal") return const SizedBox();
+    if (widget.status == "tamamlandi" || widget.status == "iptal") {
+      return const SizedBox();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,9 +54,7 @@ class AppointmentStatusActions extends StatelessWidget {
             border: OutlineInputBorder(),
             hintText: "Örn: 250",
           ),
-          onSubmitted: (_) {
-            FocusScope.of(context).unfocus(); // klavyeyi kapat
-          },
+          onSubmitted: (_) => FocusScope.of(context).unfocus(),
         ),
         const SizedBox(height: 24),
         Row(
@@ -44,7 +63,8 @@ class AppointmentStatusActions extends StatelessWidget {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
-                  controller.updateAppointmentStatus(appointmentId, "iptal");
+                  controller.updateAppointmentStatus(
+                      widget.appointmentId, "iptal");
                   Navigator.pop(context);
                 },
                 label: const Text("Randevu iptali",
@@ -68,8 +88,10 @@ class AppointmentStatusActions extends StatelessWidget {
                     return;
                   }
                   controller.updateAppointmentStatus(
-                      appointmentId, "tamamlandi",
-                      price: price);
+                    widget.appointmentId,
+                    "tamamlandi",
+                    price: price,
+                  );
                   Navigator.pop(context);
                 },
                 icon: const Icon(Icons.check_circle_outline),

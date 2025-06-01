@@ -39,6 +39,7 @@ class EmployeeSalaryController extends GetxController {
       }
     """;
 
+    // Burada date alanı String olarak geliyor; sorgunun içinde yorum bırakmıyoruz.
     const String salaryRecordsQuery = """
       query {
         salaryRecords {
@@ -47,14 +48,13 @@ class EmployeeSalaryController extends GetxController {
           type
           amount
           approved
-          description
           date
         }
       }
     """;
 
     try {
-      /// 1. Maaş bilgisini çek
+      /// 1. Çalışanın brüt maaş bilgisini çek
       final employeeResult = await client.query(QueryOptions(
         document: gql(employeeQuery),
         variables: {"id": employeeId},
@@ -69,48 +69,97 @@ class EmployeeSalaryController extends GetxController {
         print("❌ Çalışan maaş sorgusu hatası: ${employeeResult.exception}");
       }
 
-      /// 2. Salary record'ları çek
+      /// 2. Tüm salary record kayıtlarını çek
       final salaryResult = await client.query(QueryOptions(
         document: gql(salaryRecordsQuery),
         fetchPolicy: FetchPolicy.noCache,
       ));
 
       if (!salaryResult.hasException) {
-        final records = List<Map<String, dynamic>>.from(
+        final allRecords = List<Map<String, dynamic>>.from(
           salaryResult.data?['salaryRecords'] ?? [],
         );
 
-        print("📦 Tüm Salary Record Verileri:");
-        for (var e in records) {
-          print("🧾 ID: ${e['id']}, EmployeeID: ${e['employeeId']}, Type: ${e['type']}, Amount: ${e['amount']}, Approved: ${e['approved']}, Desc: ${e['description']}, Date: ${e['date']}");
+        /// 3. Önce bu çalışana ait ve onaylı kayıtları filtrele
+        final myRecords = allRecords.where((e) {
+          return e['employeeId'] == employeeId && (e['approved'] == true);
+        }).toList();
+
+        /// İçinde bulunduğumuz aya ait kayıtları bulmak için:
+        final now = DateTime.now();
+        final currentMonthRecords = myRecords.where((e) {
+          // date alanı String olarak geliyor, önce int'e parse edelim
+          final dateString = e['date']?.toString() ?? '';
+          int timestampMillis;
+
+          try {
+            timestampMillis = int.parse(dateString);
+          } catch (_) {
+            // Eğer parse edilemezse, bu kaydı dışarı al
+            print("⚠️ Geçersiz date formatı (parse hatası): $dateString");
+            return false;
+          }
+
+          final recordDate = DateTime.fromMillisecondsSinceEpoch(timestampMillis);
+          // Yıl ve ay karşılaştırması
+          return recordDate.year == now.year && recordDate.month == now.month;
+        }).toList();
+
+        /// 4. Şimdi “avans” ve “prim” için aylık toplamları hesapla
+
+        // Aylık Avanslar
+        final monthlyAdvances = currentMonthRecords.where((e) {
+          final type = (e['type'] ?? '').toString().toLowerCase();
+          return type == 'avans';
+        }).toList();
+
+        final advanceTotal = monthlyAdvances.fold<double>(
+          0.0,
+          (sum, e) {
+            final amt = (e['amount'] as num?)?.toDouble() ?? 0.0;
+            return sum + amt;
+          },
+        );
+        totalAdvance.value = advanceTotal;
+        print("✅ Bu Ayın Avans Toplamı: ₺$advanceTotal");
+
+        // Aylık Primler
+        final monthlyBonuses = currentMonthRecords.where((e) {
+          final type = (e['type'] ?? '').toString().toLowerCase();
+          return type == 'prim';
+        }).toList();
+
+        final bonusTotal = monthlyBonuses.fold<double>(
+          0.0,
+          (sum, e) {
+            final amt = (e['amount'] as num?)?.toDouble() ?? 0.0;
+            return sum + amt;
+          },
+        );
+        totalBonus.value = bonusTotal;
+        print("✅ Bu Ayın Prim Toplamı: ₺$bonusTotal");
+
+        /// 5. Şimdi her bir kaydı konsola (print) yazdıralım
+
+        print("📦 Bu Ayın Kayıtları:");
+        for (var e in currentMonthRecords) {
+          final id = e['id'] ?? 'ID yok';
+          final type = e['type'] ?? 'type yok';
+          final amount = e['amount'] ?? 0;
+          final dateString = e['date']?.toString() ?? '';
+          // parse edilmiş timestampMillis
+          final timestampMillis = int.parse(dateString);
+          final recordDate = DateTime.fromMillisecondsSinceEpoch(timestampMillis);
+
+          print(
+            "🧾 ID: $id, Type: $type, Amount: $amount, Date: $recordDate",
+          );
         }
 
-        /// Sadece bu çalışana ait kayıtlar
-        final myRecords = records.where((e) => e['employeeId'] == employeeId).toList();
-
-        /// ✅ Avans hesapla
-        final myAdvances = myRecords.where((e) {
-          final type = (e['type'] ?? '').toString().toLowerCase();
-          return type == 'avans' && e['approved'] == true;
-        }).toList();
-
-        final advanceTotal = myAdvances.fold(0.0, (sum, e) => sum + (e['amount'] ?? 0.0));
-        totalAdvance.value = advanceTotal;
-        print("✅ Avans Toplamı: $advanceTotal");
-
-        /// ✅ Prim hesapla
-        final myBonuses = myRecords.where((e) {
-          final type = (e['type'] ?? '').toString().toLowerCase();
-          return type == 'prim' && e['approved'] == true;
-        }).toList();
-
-        final bonusTotal = myBonuses.fold(0.0, (sum, e) => sum + (e['amount'] ?? 0.0));
-        totalBonus.value = bonusTotal;
-        print("✅ Prim Toplamı: $bonusTotal");
-
-        /// 📊 Net maaş = maaş - avans + prim
-        netSalary.value = employeeSalary.value - totalAdvance.value + totalBonus.value;
-        print("📊 Net Maaş: ₺${netSalary.value}");
+        /// 6. Net maaş = Brüt maaş – Aylık avanslar + Aylık primler
+        netSalary.value =
+            employeeSalary.value - totalAdvance.value + totalBonus.value;
+        print("📊 Bu Ayın Net Maaşı: ₺${netSalary.value}");
       } else {
         print("❌ Salary record sorgusu hatası: ${salaryResult.exception}");
       }

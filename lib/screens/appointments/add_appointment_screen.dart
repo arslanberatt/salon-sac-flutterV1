@@ -17,6 +17,14 @@ class AddAppointmentScreen extends StatelessWidget {
     final controller = Get.put(AddAppointmentController());
     final session = Get.find<UserSessionController>();
 
+    // 👇 UI tarafında da güvence veriyoruz (widget hazır olunca çalışır)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!session.isPatron && controller.selectedEmployeeId.value.isEmpty) {
+        controller.selectedEmployeeId.value = session.id.value;
+        print("✅ UI'da set edildi: ${controller.selectedEmployeeId.value}");
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -67,33 +75,55 @@ class AddAppointmentScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: session.isPatron
-                      ? (controller.selectedEmployeeId.value.isNotEmpty
-                          ? controller.selectedEmployeeId.value
-                          : null)
-                      : session.id.value,
-                  items: controller.employees
-                      .where((e) =>
-                          session.isPatron || e['id'] == session.id.value)
-                      .map((e) => DropdownMenuItem<String>(
-                            value: e['id'],
-                            child: Text(e['name']),
-                          ))
-                      .toList(),
-                  onChanged: session.isPatron
-                      ? (val) {
-                          if (val != null)
+
+                /// 👤 Çalışan Seçimi (patron için dropdown, çalışan için metin)
+                session.isPatron
+                    ? DropdownButtonFormField<String>(
+                        value: controller.selectedEmployeeId.value.isNotEmpty
+                            ? controller.selectedEmployeeId.value
+                            : null,
+                        items: controller.employees
+                            .where((e) => e['role'] != 'misafir')
+                            .map((e) => DropdownMenuItem<String>(
+                                  value: e['id'],
+                                  child: Text(e['name']),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) {
                             controller.selectedEmployeeId.value = val;
-                        }
-                      : null,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Çalışan',
-                  ),
-                ),
+                          }
+                        },
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Çalışan',
+                        ),
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Çalışan",
+                              style: TextStyle(fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 6),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              controller.employees.firstWhereOrNull((e) =>
+                                      e['id'] == session.id.value)?['name'] ??
+                                  'Bilinmiyor',
+                            ),
+                          ),
+                        ],
+                      ),
 
                 const SizedBox(height: 16),
+
+                /// 🧼 Hizmet Seçimi
                 const Text("Hizmetler",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
@@ -136,7 +166,7 @@ class AddAppointmentScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                /// 📅 Tarih ve Saat
+                /// 📅 Tarih ve Saat Seçimi
                 ListTile(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -182,7 +212,7 @@ class AddAppointmentScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                /// 🧮 Süre ve Ücret
+                /// ⏱ Süre ve Ücret Bilgisi
                 Obx(() => Text(
                       "Toplam Süre: ${controller.totalDuration} dk  •  Ücret: ₺${controller.totalPrice.toStringAsFixed(2)}",
                       style: const TextStyle(fontWeight: FontWeight.w500),
@@ -190,7 +220,7 @@ class AddAppointmentScreen extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                /// 🚀 Gönder Butonu
+                /// 📤 Randevu Oluşturma Butonu
                 SizedBox(
                   width: double.infinity,
                   height: 50,

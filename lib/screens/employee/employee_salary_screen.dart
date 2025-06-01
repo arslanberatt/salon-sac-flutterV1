@@ -54,7 +54,7 @@ class EmployeeSalaryScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        buildSummaryRow("Maaş", gross - bonus),
+                        buildSummaryRow("Maaş", gross),
                         buildSummaryRow("Toplam Prim", bonus),
                         buildSummaryRow("Toplam Avans", advance),
                         const Divider(height: 32),
