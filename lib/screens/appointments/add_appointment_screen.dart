@@ -1,5 +1,5 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:mobil/core/appointments/add_appointment_controller.dart';
@@ -52,26 +52,32 @@ class AddAppointmentScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// 🔍 Müşteri Arama
-                TypeAheadField<Map<String, dynamic>>(
-                  textFieldConfiguration: TextFieldConfiguration(
-                    controller: controller.customerNameController,
-                    focusNode: controller.customerFocusNode,
-                    decoration: const InputDecoration(
+                DropdownSearch<Map<String, dynamic>>(
+                  items: controller.customers,
+                  selectedItem: controller.customers.firstWhere(
+                    (c) => c['id'] == controller.selectedCustomerId.value,
+                    orElse: () => {},
+                  ),
+                  itemAsString: (item) => item['name'] ?? '',
+                  dropdownDecoratorProps: const DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
                       labelText: "Müşteri Ara",
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  suggestionsCallback: (pattern) => controller.customers
-                      .where((c) => c['name']
-                          .toLowerCase()
-                          .contains(pattern.toLowerCase()))
-                      .toList(),
-                  itemBuilder: (_, suggestion) =>
-                      ListTile(title: Text(suggestion['name'])),
-                  onSuggestionSelected: (suggestion) {
-                    controller.selectedCustomerId.value = suggestion['id'];
-                    controller.customerNameController.text = suggestion['name'];
+                  popupProps: const PopupProps.menu(
+                    showSearchBox: true,
+                    searchFieldProps: TextFieldProps(
+                      decoration: InputDecoration(
+                        hintText: 'Müşteri ismi girin',
+                      ),
+                    ),
+                  ),
+                  onChanged: (selected) {
+                    if (selected != null) {
+                      controller.selectedCustomerId.value = selected['id'];
+                      controller.customerNameController.text = selected['name'];
+                    }
                   },
                 ),
                 const SizedBox(height: 16),
