@@ -80,18 +80,24 @@ class AppointmentScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Expanded(
-                child: controller.filteredAppointments.isEmpty
-                    ? const Center(child: Text("Bu tarihte randevu yok."))
-                    : RefreshIndicator(
-                        onRefresh: () async {
-                          await controller.fetchAppointments();
-                        },
-                        child: ListView.builder(
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    await controller.fetchAppointments();
+                  },
+                  child: controller.filteredAppointments.isEmpty
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: const [
+                            SizedBox(height: 300),
+                            Center(child: Text("Bu tarihte randevu yok.")),
+                          ],
+                        )
+                      : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           itemCount: controller.filteredAppointments.length,
                           itemBuilder: (context, index) {
                             final appt = controller.filteredAppointments[index];
 
-                            print("Appointment: ${appt['notes']}");
                             return Column(
                               children: [
                                 AppointmentCard(
@@ -103,8 +109,8 @@ class AppointmentScreen extends StatelessWidget {
                                       controller.formatTime(appt['startTime']),
                                   checkOut:
                                       controller.formatTime(appt['endTime']),
-                                  duration:
-                                      "${controller.calculateDuration(appt['startTime'], appt['endTime'])}",
+                                  duration: controller.calculateDuration(
+                                      appt['startTime'], appt['endTime']),
                                   appointmentId: appt['id'],
                                   services: controller
                                       .getServicesByIds(appt['serviceIds']),
@@ -117,7 +123,7 @@ class AppointmentScreen extends StatelessWidget {
                             );
                           },
                         ),
-                      ),
+                ),
               ),
             ],
           ),

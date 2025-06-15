@@ -62,6 +62,8 @@ class AppointmentController extends GetxController {
 """;
 
   Future<void> fetchAppointments() async {
+    print("🟢 Randevular çekildi: ${appointments.length} kayıt");
+
     loading.value = true;
     final client = GraphQLService.client.value;
 
@@ -93,6 +95,21 @@ class AppointmentController extends GetxController {
 
       if (appointmentResult.hasException) {
         print("❌ Appointment query hatası: ${appointmentResult.exception}");
+        return;
+      }
+      
+      if (appointmentResult.hasException) {
+        final errorMsg =
+            appointmentResult.exception!.graphqlErrors.first.message;
+
+        if (errorMsg == 'Yetkisiz işlem.') {
+          print("🚨 Token geçersiz! Temizleniyor...");
+          await GraphQLService.storage.delete(key: "token");
+          Get.offAllNamed('/login'); // ya da istediğin logout yönlendirmesi
+          return;
+        }
+
+        print("❌ Appointment query hatası: $errorMsg");
         return;
       }
 

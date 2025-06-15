@@ -80,12 +80,21 @@ class EmployeesScreen extends StatelessWidget {
             .where((e) => e["role"]?.toUpperCase() == "CALISAN")
             .toList();
 
+        final guests = allEmployees
+            .where((e) => e["role"]?.toUpperCase() == "MISAFIR")
+            .toList();
+
         if (allEmployees.isEmpty) {
           return const Center(child: Text("Hiç çalışan bulunamadı."));
         }
 
         return RefreshIndicator(
-          onRefresh: employeeController.fetchEmployees,
+          onRefresh: () async {
+            await Future.wait([
+              employeeController.fetchEmployees(),
+              advanceApprovalController.fetchAdvanceRequests(),
+            ]);
+          },
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -93,6 +102,24 @@ class EmployeesScreen extends StatelessWidget {
               if (workers.isNotEmpty) ...[
                 const SectionTitle(title: "Çalışanlar"),
                 ...workers.map((emp) => ZenithProjectCard(
+                      employee: emp,
+                      onTap: () async {
+                        final result = await Get.to(
+                            () => EmployeeDetailScreen(employee: emp));
+                        if (result is Map<String, dynamic>) {
+                          final index = employeeController.employees
+                              .indexWhere((e) => e["id"] == result["id"]);
+                          if (index != -1) {
+                            employeeController.employees[index] = result;
+                            employeeController.employees.refresh();
+                          }
+                        }
+                      },
+                    )),
+              ],
+              if (guests.isNotEmpty) ...[
+                const SectionTitle(title: "Onay Bekleyenler"),
+                ...guests.map((emp) => ZenithProjectCard(
                       employee: emp,
                       onTap: () async {
                         final result = await Get.to(
@@ -240,8 +267,7 @@ class ZenithProjectCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildInfoColumn(
-                      "Maaş", "₺${(salary - monthlyBonus).toStringAsFixed(0)}"),
+                  _buildInfoColumn("Maaş", "₺${(salary).toStringAsFixed(0)}"),
                 ],
               ),
 
